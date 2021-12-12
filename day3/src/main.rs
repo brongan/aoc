@@ -1,61 +1,96 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-fn most_common_elements(lines: Vec<String>) -> Vec<char> {
-    return (0..lines[0].len())
+fn most_common_elements(lines: &[String]) -> Vec<char> {
+    (0..lines[0].len())
         .map(|col| {
-            let mut one_count: i64 = 0;
-            for line in lines.iter() {
-                if line.as_bytes()[col] == b'1' {
-                    one_count += 1
-                }
-            }
-            if one_count > lines.len() as i64 - one_count {
+            let one_count = lines
+                .iter()
+                .map(|l| l.as_bytes()[col])
+                .filter(|c| *c == b'1')
+                .count();
+            if one_count >= lines.len() - one_count {
                 '1'
             } else {
                 '0'
             }
         })
-        .collect();
+        .collect()
 }
-fn main() {
-    let f = File::open("input").expect("Failed to open input");
-    let f = BufReader::new(f);
-    let lines: Vec<String> = f.lines().flatten().collect();
-    let line_length = lines[0].len();
 
-    // calculate number of ones in each column
-    // Part 1
-    let mut gamma_rate: Vec<char> = Vec::with_capacity(line_length);
-    let mut epsilon_rate: Vec<char> = Vec::with_capacity(line_length);
-    println!("Line Length: {}", line_length);
+fn part1(lines: &[String]) -> u32 {
+    let mut gamma = 0;
+    let mut epsilon = 0;
     for elem in most_common_elements(lines) {
+        gamma *= 2;
+        epsilon *= 2;
         if elem == '1' {
-            gamma_rate.push('1');
-            epsilon_rate.push('0');
+            gamma += 1;
         } else {
-            gamma_rate.push('0');
-            epsilon_rate.push('1');
+            epsilon += 1;
         }
     }
-    let gamma_rate_string: String = gamma_rate.clone().into_iter().collect();
-    let epsilon_rate_string: String = epsilon_rate.clone().into_iter().collect();
-    println!("Gamma Rate: {:?} {}", &gamma_rate, gamma_rate_string);
-    println!("Epsilon Rate: {:?} {}", &epsilon_rate, epsilon_rate_string);
-    let result = u32::from_str_radix(&gamma_rate_string, 2).unwrap()
-        * u32::from_str_radix(&epsilon_rate_string, 2).unwrap();
-    println!("Result: {}", result);
+    gamma * epsilon
+}
 
-    // Part 2
-    // Oxygen generator rating + co2 scrubber rating
-    let mut oxygen_gen_lines: Vec<String> = lines.clone();
+fn part2(lines: &[String]) -> u32 {
+    let mut oxygen_gen_lines: Vec<String> = lines.to_vec();
     let mut col: usize = 0;
     while oxygen_gen_lines.len() > 1 {
-        let commonz = most_common_elements(oxygen_gen_lines);
+        let commonz = most_common_elements(&oxygen_gen_lines);
         oxygen_gen_lines = oxygen_gen_lines
             .into_iter()
             .filter(|line| line.as_bytes()[col] == commonz[col] as u8)
             .collect();
         col += 1;
     }
+    let mut co2_gen_lines = lines.to_vec();
+    let mut col = 0;
+    while co2_gen_lines.len() > 1 {
+        let commonz = most_common_elements(&co2_gen_lines);
+        co2_gen_lines = co2_gen_lines
+            .into_iter()
+            .filter(|line| line.as_bytes()[col] != commonz[col] as u8)
+            .collect();
+        col += 1;
+    }
+
+    let oxygen_gen_rate = u32::from_str_radix(&oxygen_gen_lines[0], 2).unwrap();
+    let co2_gen_rate = u32::from_str_radix(&co2_gen_lines[0], 2).unwrap();
+    oxygen_gen_rate * co2_gen_rate
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pt_2() {
+        let input: Vec<String> = "00100
+								  11110
+							  	  10110
+								  10111
+								  10101
+								  01111
+								  00111
+								  11100
+								  10000
+								  11001
+								  00010
+								  01010"
+            .to_string()
+            .split_whitespace()
+            .into_iter()
+            .map(|s| s.to_owned())
+            .collect();
+        assert_eq!(part2(&input), 230);
+    }
+}
+
+fn main() {
+    let f = File::open("input").expect("Failed to open input");
+    let f = BufReader::new(f);
+    let lines: Vec<String> = f.lines().flatten().collect();
+    println!("Part 1 Result: {}", part1(&lines));
+    println!("Part 2 Result: {}", part2(&lines));
 }
