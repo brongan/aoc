@@ -13,13 +13,10 @@ fn main() {
         .map(|s| s.parse::<u32>().expect("Failed to parse input"))
         .collect();
 
-    let mut count = 1;
-    for (first, second) in zip(&input, &input[1..]) {
-        if second > first && *first != 0 {
-            count += 1
-        }
-    }
-    println!("{} Increased!", count);
+    let count = 1 + zip(&input, &input[1..])
+        .filter(|(first, second)| second > first && **first != 0)
+        .count();
+    println!("Part 1: {}", count);
 
     let mut count = 1;
     let mut old_sum: u32 = input[0..3].iter().sum();
@@ -31,5 +28,5 @@ fn main() {
         }
         old_sum = new_sum
     }
-    println!("{} Increased!", count);
+    println!("Part 2: {}", count);
 }
