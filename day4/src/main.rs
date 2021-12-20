@@ -46,23 +46,22 @@ fn pull(board: &mut BingoBoard, num: u32) -> bool {
 // If all numbers in any row or any column of a board are marked,
 // that board wins. (Diagonals don't count.)
 fn is_complete(board: &BingoBoard) -> bool {
-    for row in board {
-        if row.iter().filter(|elem| elem.is_set).count() == BOARD_SIZE {
-            return true;
-        }
+    if board
+        .map(|row| row.iter().all(|elem| elem.is_set))
+        .iter()
+        .any(|b| *b)
+    {
+        return true;
     }
-    for col in 0..BOARD_SIZE {
-        if board
-            .iter()
-            .map(|row| row.get(col).unwrap())
-            .filter(|elem| elem.is_set)
-            .count()
-            == BOARD_SIZE
-        {
-            return true;
-        }
-    }
-    false
+    (0..board[0].len())
+        .into_iter()
+        .map(|col| {
+            board
+                .iter()
+                .map(|row| row.get(col).unwrap())
+                .all(|elem| elem.is_set)
+        })
+        .any(|b| b)
 }
 
 // Start by finding the sum of all unmarked numbers on that board.
@@ -92,7 +91,7 @@ impl FromStr for BingoGame {
             input,
             boards: lines
                 .chunks(BOARD_SIZE)
-                .map(|idk| parse_bingo_board(idk.to_vec()))
+                .map(|chonk| parse_bingo_board(chonk.to_vec()))
                 .collect::<Option<Vec<BingoBoard>>>()
                 .expect("Failed to parse boards"),
         })
