@@ -1,5 +1,5 @@
 #![feature(int_abs_diff)]
-use std::cmp::{max, min};
+use std::cmp::{max, Ordering};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};
 use std::vec;
@@ -38,44 +38,33 @@ fn seafloor_from_lines(
     let mut seafloor = vec![vec![0i32; max_index]; max_index];
 
     for line in lines.iter().filter(|line| filter(**line)) {
-        for row in &seafloor {
-            println!("{:?}", row);
-        }
-        println!();
-        if line.1.y - line.0.y == 0 {
-            for x in min(line.0.x, line.1.x)..max(line.0.x, line.1.x) + 1 {
-                seafloor[x as usize][line.0.y as usize] += 1;
-            }
-        } else if line.1.x - line.0.x == 0 {
-            for y in min(line.0.y, line.1.y)..max(line.0.y, line.1.y) + 1 {
-                seafloor[line.0.x as usize][y as usize] += 1;
-            }
-        } else {
-            let (start, end) = if line.0.x < line.1.x {
-                (line.0, line.1)
-            } else {
-                (line.1, line.0)
-            };
-
-            let delta_y = if end.y > start.y { 1 } else { -1 };
-
-            for i in start.x..(end.x - start.x) {
-                seafloor[(start.x + i) as usize][(start.y + delta_y) as usize] += 1
-            }
+        let delta_x: i32 = match (line.1.x).partial_cmp(&line.0.x) {
+            Some(Ordering::Greater) => 1,
+            Some(Ordering::Equal) => 0,
+            Some(Ordering::Less) => -1,
+            None => panic!("How this this Possible"),
+        };
+        let delta_y: i32 = match (line.1.y).partial_cmp(&line.0.y) {
+            Some(Ordering::Greater) => 1,
+            Some(Ordering::Equal) => 0,
+            Some(Ordering::Less) => -1,
+            None => panic!("How this this Possible"),
+        };
+        for i in 0..(max(
+            i32::abs_diff(line.0.x, line.1.x),
+            i32::abs_diff(line.0.y, line.1.y),
+        ) + 1) as i32
+        {
+            let x = line.0.x + (delta_x * i);
+            let y = line.0.y + (delta_y * i);
+            seafloor[x as usize][y as usize] += 1;
         }
     }
-
-    println!("printing seafloor");
-    for row in &seafloor {
-        println!("{:?}", row);
-    }
-
     seafloor
 }
 
 fn part1(lines: &[VentLine], max: usize) -> usize {
     let seafloor = seafloor_from_lines(lines, part1_filter, max);
-
     seafloor.iter().flatten().filter(|x| **x >= 2).count()
 }
 
@@ -86,7 +75,7 @@ fn part1_filter(line: VentLine) -> bool {
 fn part2(lines: &[VentLine], max: usize) -> usize {
     fn part2_filter(line: VentLine) -> bool {
         part1_filter(line)
-            || (i32::abs_diff(line.0.x, line.1.x) == 1 && i32::abs_diff(line.0.y, line.1.y) == 1)
+            || (i32::abs_diff(line.0.x, line.1.x) == i32::abs_diff(line.0.y, line.1.y))
     }
     let seafloor = seafloor_from_lines(lines, part2_filter, max);
     seafloor.iter().flatten().filter(|x| **x >= 2).count()
