@@ -21,23 +21,29 @@ fn parse_input(input: &str) -> (Vec<char>, HashMap<(char, char), char>) {
             )
         })
         .collect();
-
     (template, rules)
 }
 
-struct Memoize {
+struct PolymerCounter {
     dp: HashMap<(char, char, usize), Counter<char>>,
     rules: HashMap<(char, char), char>,
 }
 
-impl Memoize {
-    fn memoize(&mut self, a: char, b: char, num: usize) -> Counter<char> {
+impl PolymerCounter {
+    fn init(&mut self) {
+        for ((a, b), c) in &self.rules {
+            self.dp.insert((*a, *b, 1), Counter::init([*a, *b, *c]));
+        }
+    }
+
+    fn simulate_insertion(&mut self, a: char, b: char, num: usize) -> Counter<char> {
         if self.dp.contains_key(&(a, b, num)) {
             return self.dp[&(a, b, num)].clone();
         }
-        let mid = self.rules[&(a, b)];
-        let ret = self.memoize(a, mid, num - 1) + self.memoize(mid, b, num - 1);
-        self.dp.get_mut(&(a, b, num)).unwrap().extend(&ret);
+        let insertion = self.rules[&(a, b)];
+        let ret = self.simulate_insertion(a, insertion, num - 1)
+            + self.simulate_insertion(insertion, b, num - 1);
+        self.dp.insert((a, b, num), ret.clone());
         ret
     }
 }
@@ -47,13 +53,14 @@ fn run_polymerization(
     rules: HashMap<(char, char), char>,
     steps: usize,
 ) -> usize {
-    let mut memoize = Memoize {
+    let mut insertion_simulator = PolymerCounter {
         dp: HashMap::new(),
         rules,
     };
+    insertion_simulator.init();
     let mut char_counts: Counter<char> = Counter::new();
     for pair in template.windows(2) {
-        char_counts += memoize.memoize(pair[0], pair[1], steps);
+        char_counts += insertion_simulator.simulate_insertion(pair[0], pair[1], steps);
     }
     return char_counts.values().max().unwrap() - char_counts.values().min().unwrap();
 }
