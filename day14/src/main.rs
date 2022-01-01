@@ -24,45 +24,34 @@ fn parse_input(input: &str) -> (Vec<char>, HashMap<(char, char), char>) {
     (template, rules)
 }
 
-struct PolymerCounter {
-    dp: HashMap<(char, char, usize), Counter<char>>,
-    rules: HashMap<(char, char), char>,
-}
-
-impl PolymerCounter {
-    fn init(&mut self) {
-        for ((a, b), c) in &self.rules {
-            self.dp.insert((*a, *b, 1), Counter::init([*a, *b, *c]));
-        }
-    }
-
-    fn simulate_insertion(&mut self, a: char, b: char, num: usize) -> Counter<char> {
-        if self.dp.contains_key(&(a, b, num)) {
-            return self.dp[&(a, b, num)].clone();
-        }
-        let insertion = self.rules[&(a, b)];
-        let ret = self.simulate_insertion(a, insertion, num - 1)
-            + self.simulate_insertion(insertion, b, num - 1);
-        self.dp.insert((a, b, num), ret.clone());
-        ret
-    }
-}
+type Pair = (char, char);
 
 fn run_polymerization(
     template: &[char],
     rules: HashMap<(char, char), char>,
     steps: usize,
 ) -> usize {
-    let mut insertion_simulator = PolymerCounter {
-        dp: HashMap::new(),
-        rules,
-    };
-    insertion_simulator.init();
-    let mut char_counts: Counter<char> = Counter::new();
-    for pair in template.windows(2) {
-        char_counts += insertion_simulator.simulate_insertion(pair[0], pair[1], steps);
+    let mut pair_counts: Counter<Pair> =
+        Counter::init(template.windows(2).map(|window| (window[0], window[1])));
+    for _ in 0..steps {
+        let mut new_pair_counts: Counter<Pair> = Counter::new();
+        for ((a, c), count) in pair_counts.iter() {
+            let b = rules[&(*a, *c)];
+            new_pair_counts[&(*a, b)] += count;
+            new_pair_counts[&(b, *c)] += count;
+        }
+        pair_counts = new_pair_counts;
     }
-    return char_counts.values().max().unwrap() - char_counts.values().min().unwrap();
+
+    let mut char_counts: Counter<char> = Counter::new();
+    for ((a, b), count) in pair_counts.iter() {
+        char_counts[a] += count;
+        char_counts[b] += count;
+    }
+    for (_c, count) in char_counts.iter_mut() {
+        *count /= 2;
+    }
+    return char_counts.values().max().unwrap() - char_counts.values().min().unwrap() + 1;
 }
 
 fn main() {
@@ -100,6 +89,6 @@ CC -> N
 CN -> C";
         let (template, rules) = parse_input(input);
         assert_eq!(run_polymerization(&template, rules.clone(), 10), 1588);
-        //assert_eq!(run_polymerization(&template, rules, 40), 2188189693529);
+        assert_eq!(run_polymerization(&template, rules, 40), 2188189693529);
     }
 }
