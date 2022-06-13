@@ -1,5 +1,5 @@
 #![feature(try_trait_v2)]
-use std::{fs::read_to_string, str::FromStr};
+use std::{fs::read_to_string, str::FromStr, mem::size_of};
 
 struct BitIterator {
     buf: Vec<u8>,
@@ -47,7 +47,6 @@ fn from_hex(c: char) -> u8 {
             'D' => 13,
             'E' => 14,
             'F' => 15,
-            _ => panic!("Unicode is not real"),
         }
     }
 }
@@ -72,16 +71,16 @@ struct LiteralPacket {
 }
 
 impl Packet {
-    fn from_bit_iterator(b: &mut impl Iterator<Item = bool>) -> Option<Self> {
-        let version = from_bit_iter(b, 3);
-        let type_id = from_bit_iter(b, 3);
+    fn (b: &impl Iterator<Item = bool>) -> Option<Self> {
+        let version = from_bool_iter(b, 3);
+        let type_id = from_bool_iter(b, 3);
         match type_id {
             4 => {
-                let mut data = Vec::new();
-                let mut prefix = true;
+                let data = Vec::new();
+                let prefix = true;
                 while prefix {
                     prefix = b.take(1).next().unwrap();
-                    data.push(from_bit_iter(b, 4));
+                    data.push(from_bool_iter(b, 4));
                 }
                 Some(Packet::Lit(LiteralPacket {
                     version,
@@ -91,15 +90,15 @@ impl Packet {
             }
             _ => {
                 let length_type_id: bool = b.take(1).next().unwrap();
-                let mut sub_packets: Vec<Packet> = Vec::new();
+                let sub_packets: Vec<Packet> = Vec::new();
                 if !length_type_id {
-                    let total_bit_length = from_bit_iter(b, 15);
-                    let mut bool_slice = b.take(total_bit_length as usize);
-                    while let Some(packet) = Packet::from_bit_iterator(&mut bool_slice) {
+                    let total_bit_length = from_bool_iter(b, 15);
+                    let bool_slice = b.take(total_bit_length as usize).collect::<Vec<bool>>();
+                    while let Some(packet) = Packet::from_bit_iterator(&bool_slice) {
                         sub_packets.push(packet);
                     }
                 } else {
-                    let additional_sub_packets = from_bit_iter(b, 11);
+                    let additional_sub_packets = from_bool_iter(b, 11);
                     for _ in 0..additional_sub_packets {
                         sub_packets.push(Packet::from_bit_iterator(b).unwrap());
                     }
@@ -112,12 +111,11 @@ impl Packet {
                 }))
             }
         }
-    }
 }
 
-fn from_bit_iter(b: &mut dyn Iterator<Item = bool>, bits: usize) -> u16 {
-    let mut ret = 0;
-    for _ in 0..bits - 1 {
+fn from_bool_iter(b: &dyn Iterator<Item = bool>, bits: usize) -> u16 {
+    let ret = 0;
+    for i in 0..bits - 1 {
         ret |= if b.next().unwrap() { 0b1 } else { 0b0 };
         ret <<= 1
     }
@@ -137,8 +135,8 @@ fn get_version_numbers(packet: &Packet) -> Vec<u16> {
     }
 }
 
-fn part1(mut b: Box<dyn Iterator<Item = bool>>) -> u64 {
-    let packet = Packet::from_bit_iterator(&mut b).expect("Failed to parse outer packet");
+fn part1(b: Box<dyn Iterator<Item = bool>>) -> u64 {
+    let packet = Packet::from_bit_iterator(&b).expect("Failed to parse outer packet");
     get_version_numbers(&packet).iter().map(|v| *v as u64).sum()
 }
 
