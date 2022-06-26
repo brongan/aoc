@@ -1,14 +1,21 @@
-use std::{collections::HashSet, fs::read_to_string};
+use super::AdventOfCode2021;
+use crate::aoc::ParseInput;
+use crate::aoc::{Day, Part, Solution};
+use std::collections::HashSet;
 
-fn parse_input(input: &str) -> Vec<Vec<u32>> {
-    input
-        .split('\n')
-        .map(|l| {
-            l.chars()
-                .map(|c| c.to_digit(10).expect("failed to parse digit"))
-                .collect()
-        })
-        .collect()
+impl ParseInput<'_, { Day::Eleven }> for AdventOfCode2021<{ Day::Eleven }> {
+    type Parsed = Vec<Vec<u32>>;
+
+    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+        input
+            .split('\n')
+            .map(|l| {
+                l.chars()
+                    .map(|c| c.to_digit(10).expect("failed to parse digit"))
+                    .collect()
+            })
+            .collect()
+    }
 }
 
 fn get_neighbors(i: i32, j: i32, num_rows: i32, num_col: i32) -> Vec<(usize, usize)> {
@@ -32,12 +39,18 @@ fn get_neighbors(i: i32, j: i32, num_rows: i32, num_col: i32) -> Vec<(usize, usi
     neighbors
 }
 
-fn part1(mut energy_levels: Vec<Vec<u32>>, steps: usize) -> usize {
-    let mut ret = 0;
-    for _ in 0..steps {
-        ret += step(&mut energy_levels);
+impl Solution<'_, { Day::Eleven }, { Part::One }> for AdventOfCode2021<{ Day::Eleven }> {
+    type Input = Vec<Vec<u32>>;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let mut input = input.clone();
+        let mut ret = 0;
+        for _ in 0..100 {
+            ret += step(&mut input);
+        }
+        ret
     }
-    ret
 }
 
 fn step(energy_levels: &mut Vec<Vec<u32>>) -> usize {
@@ -75,28 +88,27 @@ fn step(energy_levels: &mut Vec<Vec<u32>>) -> usize {
     on_cooldown.len()
 }
 
-fn part2(mut energy_levels: Vec<Vec<u32>>) -> usize {
-    let octopus_count = energy_levels.iter().flatten().count();
-    let mut ret = 1;
-    while step(&mut energy_levels) != octopus_count {
-        ret += 1;
-    }
-    ret
-}
+impl Solution<'_, { Day::Eleven }, { Part::Two }> for AdventOfCode2021<{ Day::Eleven }> {
+    type Input = Vec<Vec<u32>>;
+    type Output = usize;
 
-pub fn main(input_path: &str) {
-    let energy_levels = parse_input(
-        read_to_string(input_path)
-            .expect("failed to read input")
-            .trim(),
-    );
-    println!("Part 1: {}", part1(energy_levels.clone(), 100));
-    println!("Part 2: {}", part2(energy_levels));
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let mut input = input.clone();
+        let octopus_count = input.iter().flatten().count();
+        let mut ret = 1;
+        while step(&mut input) != octopus_count {
+            ret += 1;
+        }
+        ret
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::aoc::PartOneVerifier;
+    use crate::aoc::PartTwoVerifier;
+
     #[test]
     fn test() {
         let input = "5483143223
@@ -109,8 +121,8 @@ mod tests {
 6882881134
 4846848554
 5283751526";
-        let input = parse_input(input);
-        assert_eq!(part1(input.clone(), 100), 1656);
-        assert_eq!(part2(input), 195);
+        let problem = super::AdventOfCode2021::<{ Day::Eleven }>;
+        (&&&problem).test_part1(input, 1656);
+        (&&&problem).test_part2(input, 195);
     }
 }

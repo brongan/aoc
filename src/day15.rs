@@ -1,25 +1,29 @@
+use super::AdventOfCode2021;
+use crate::aoc::ParseInput;
+use crate::aoc::{Day, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
 use std::collections::HashSet;
-use std::{
-    collections::{BinaryHeap, HashMap},
-    fs::read_to_string,
-};
+use std::collections::{BinaryHeap, HashMap};
 
 use colored::Colorize;
 
 type Point = (usize, usize);
 
-fn parse_input(input: &str) -> Vec<Vec<u32>> {
-    input
-        .split('\n')
-        .map(|line| {
-            line.trim()
-                .chars()
-                .map(|c| c.to_digit(10).expect("invalid digit"))
-                .collect()
-        })
-        .collect()
+impl ParseInput<'_, { Day::Fifteen }> for AdventOfCode2021<{ Day::Fifteen }> {
+    type Parsed = Vec<Vec<u32>>;
+
+    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+        input
+            .split('\n')
+            .map(|line| {
+                line.trim()
+                    .chars()
+                    .map(|c| c.to_digit(10).expect("invalid digit"))
+                    .collect()
+            })
+            .collect()
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -124,16 +128,15 @@ fn print_map(map: &[Vec<u32>], prev: &HashSet<Point>) {
     }
 }
 
-fn part1(map: &[Vec<u32>]) -> u32 {
-    let (prev, path_cost) = djikstra(map).expect("Did not find solution");
-    print_map(map, &prev);
-    path_cost
-}
+impl Solution<'_, { Day::Fifteen }, { Part::One }> for AdventOfCode2021<{ Day::Fifteen }> {
+    type Input = Vec<Vec<u32>>;
+    type Output = u32;
 
-fn part2(map: &[Vec<u32>]) -> u32 {
-    let (prev, path_cost) = djikstra(map).expect("Did not find solution");
-    print_map(map, &prev);
-    path_cost
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let (prev, path_cost) = djikstra(input).expect("Did not find solution");
+        print_map(input, &prev);
+        path_cost
+    }
 }
 
 fn part2_extend(map: Vec<Vec<u32>>) -> Vec<Vec<u32>> {
@@ -163,20 +166,24 @@ fn part2_extend(map: Vec<Vec<u32>>) -> Vec<Vec<u32>> {
     ret
 }
 
-pub fn main(input_path: &str) {
-    let input = parse_input(
-        read_to_string(input_path)
-            .expect("failed to read input")
-            .trim(),
-    );
-    println!("Part 1: {}", part1(&input));
-    let extended_input = part2_extend(input);
-    println!("Part 2: {}", part2(&extended_input));
+impl Solution<'_, { Day::Fifteen }, { Part::Two }> for AdventOfCode2021<{ Day::Fifteen }> {
+    type Input = Vec<Vec<u32>>;
+    type Output = u32;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let input = part2_extend(input.to_vec());
+        let (prev, path_cost) = djikstra(&input).expect("Did not find solution");
+        print_map(&input, &prev);
+        path_cost
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::aoc::PartOneVerifier;
+    use crate::aoc::PartTwoVerifier;
+
     #[test]
     fn test() {
         let input = "1163751742
@@ -239,11 +246,13 @@ mod tests {
 75698651748671976285978218739618932984172914319528
 56475739656758684176786979528789718163989182927419
 67554889357866599146897761125791887223681299833479";
-        let input = parse_input(input);
-        assert_eq!(part1(&input), 40);
-        let expected_extended_input = parse_input(expected_extended_input);
-        let extended_input = part2_extend(input);
+        let problem = super::AdventOfCode2021::<{ Day::Fifteen }>;
+        let parsed_input = (&&&problem).parse_input(input);
+        (&&&problem).test_part1(input, 40);
+
+        let expected_extended_input = (&&&problem).parse_input(expected_extended_input);
+        let extended_input = part2_extend(parsed_input);
         assert_eq!(extended_input, expected_extended_input);
-        assert_eq!(part2(&extended_input), 315);
+        (&&&problem).test_part2(input, 315);
     }
 }

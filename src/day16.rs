@@ -1,11 +1,15 @@
-use std::{fs::read_to_string, str::FromStr};
+use super::AdventOfCode2021;
+use crate::aoc::ParseInput;
+use crate::aoc::{Day, Part, Solution};
+use std::iter::Iterator;
+use std::str::FromStr;
 
-struct BitIterator {
+#[derive(Clone)]
+pub struct BitIterator {
     buf: Vec<u8>,
     index: usize,
     bit_index: u8,
 }
-
 impl FromStr for BitIterator {
     type Err = std::string::ParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -74,42 +78,39 @@ impl Packet {
     fn from_bit_iterator(b: &mut impl Iterator<Item = bool>) -> Option<Self> {
         let version = from_bit_iter(b, 3);
         let type_id = from_bit_iter(b, 3);
-        match type_id {
-            4 => {
-                let mut data = Vec::new();
-                let mut prefix = true;
-                while prefix {
-                    prefix = b.take(1).next().unwrap();
-                    data.push(from_bit_iter(b, 4));
-                }
-                Some(Packet::Lit(LiteralPacket {
-                    version,
-                    type_id,
-                    data,
-                }))
+        if let 4 = type_id {
+            let mut data = Vec::new();
+            let mut prefix = true;
+            while prefix {
+                prefix = b.take(1).next().unwrap();
+                data.push(from_bit_iter(b, 4));
             }
-            _ => {
-                let length_type_id: bool = b.take(1).next().unwrap();
-                let mut sub_packets: Vec<Packet> = Vec::new();
-                if !length_type_id {
-                    let total_bit_length = from_bit_iter(b, 15);
-                    let mut bool_slice = b.take(total_bit_length as usize);
-                    while let Some(packet) = Packet::from_bit_iterator(&mut bool_slice) {
-                        sub_packets.push(packet);
-                    }
-                } else {
-                    let additional_sub_packets = from_bit_iter(b, 11);
-                    for _ in 0..additional_sub_packets {
-                        sub_packets.push(Packet::from_bit_iterator(b).unwrap());
-                    }
+            Some(Packet::Lit(LiteralPacket {
+                version,
+                type_id,
+                data,
+            }))
+        } else {
+            let length_type_id: bool = b.take(1).next().unwrap();
+            let mut sub_packets: Vec<Packet> = Vec::new();
+            if !length_type_id {
+                let total_bit_length = from_bit_iter(b, 15);
+                let mut bool_slice = b.take(total_bit_length as usize);
+                while let Some(packet) = Packet::from_bit_iterator(&mut bool_slice) {
+                    sub_packets.push(packet);
                 }
-                Some(Packet::Op(OperatorPacket {
-                    version,
-                    type_id,
-                    length_type_id,
-                    sub_packets,
-                }))
+            } else {
+                let additional_sub_packets = from_bit_iter(b, 11);
+                for _ in 0..additional_sub_packets {
+                    sub_packets.push(Packet::from_bit_iterator(b).unwrap());
+                }
             }
+            Some(Packet::Op(OperatorPacket {
+                version,
+                type_id,
+                length_type_id,
+                sub_packets,
+            }))
         }
     }
 }
@@ -136,14 +137,20 @@ fn get_version_numbers(packet: &Packet) -> Vec<u16> {
     }
 }
 
-fn part1(mut b: Box<dyn Iterator<Item = bool>>) -> u64 {
-    let packet = Packet::from_bit_iterator(&mut b).expect("Failed to parse outer packet");
-    get_version_numbers(&packet).iter().map(|v| *v as u64).sum()
+impl ParseInput<'_, { Day::Sixteen }> for AdventOfCode2021<{ Day::Sixteen }> {
+    type Parsed = BitIterator;
+
+    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+        BitIterator::from_str(input).expect("failed to parse input")
+    }
 }
 
+impl Solution<'_, { Day::Sixteen }, { Part::One }> for AdventOfCode2021<{ Day::Sixteen }> {
+    type Input = BitIterator;
+    type Output = u64;
 
-pub fn main(input_path: &str) {
-    let input = BitIterator::from_str(read_to_string(input_path).expect("bad file").trim())
-        .expect("Failed to parse input");
-    println!("Part 1: {}", part1(Box::new(input)));
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let packet = Packet::from_bit_iterator(&mut input.clone()).expect("failed to parse input");
+        get_version_numbers(&packet).iter().map(|v| *v as u64).sum()
+    }
 }

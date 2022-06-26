@@ -1,2 +1,1 @@
-pub fn main(input_path: &str) {
-}
+pub fn solve(input_path: &str) {}

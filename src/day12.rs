@@ -1,8 +1,11 @@
 use std::{
     collections::{HashMap, HashSet},
-    fs::read_to_string,
     str::FromStr,
 };
+
+use super::AdventOfCode2021;
+use crate::aoc::ParseInput;
+use crate::aoc::{Day, Part, Solution};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 enum Node {
@@ -35,7 +38,7 @@ impl FromStr for Node {
     }
 }
 
-struct CaveGraph {
+pub struct CaveGraph {
     edgelists: HashMap<Node, Vec<Node>>,
 }
 
@@ -119,28 +122,38 @@ impl FromStr for CaveGraph {
     }
 }
 
-fn part1(cave: &CaveGraph) -> usize {
-    cave.find_all_paths(0).len()
+impl ParseInput<'_, { Day::Twelve }> for AdventOfCode2021<{ Day::Twelve }> {
+    type Parsed = CaveGraph;
+
+    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+        CaveGraph::from_str(input).expect("failed to parse input")
+    }
 }
 
-fn part2(cave: &CaveGraph) -> usize {
-    cave.find_all_paths(1).len()
+impl Solution<'_, { Day::Twelve }, { Part::One }> for AdventOfCode2021<{ Day::Twelve }> {
+    type Input = CaveGraph;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        input.find_all_paths(0).len()
+    }
 }
 
-pub fn main(input_path: &str) {
-    let input = CaveGraph::from_str(
-        read_to_string(input_path)
-            .expect("failed to read input")
-            .trim(),
-    )
-    .expect("Failed to parse input into graph");
-    println!("Part 1: {}", part1(&input));
-    println!("Part 2: {}", part2(&input));
+impl Solution<'_, { Day::Twelve }, { Part::Two }> for AdventOfCode2021<{ Day::Twelve }> {
+    type Input = CaveGraph;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        input.find_all_paths(1).len()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::aoc::PartOneVerifier;
+    use crate::aoc::PartTwoVerifier;
+
     #[test]
     fn test() {
         let input = "fs-end
@@ -161,8 +174,8 @@ he-WI
 zg-he
 pj-fs
 start-RW";
-        let input = CaveGraph::from_str(input).expect("failed to parse cave graph");
-        assert_eq!(part1(&input), 226);
-        assert_eq!(part2(&input), 3509);
+        let problem = super::AdventOfCode2021::<{ Day::Twelve }>;
+        (&&&problem).test_part1(input, 226);
+        (&&&problem).test_part2(input, 3509);
     }
 }
