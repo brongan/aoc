@@ -1,34 +1,46 @@
-use std::{collections::HashMap, fs::read_to_string};
+use super::AdventOfCode2021;
+use crate::aoc::ParseInput;
+use crate::aoc::{Day, Part, Solution};
+use std::collections::HashMap;
 
 use counter::Counter;
 
-fn parse_input(input: &str) -> (Vec<char>, HashMap<(char, char), char>) {
-    let input = input.trim().split_once("\n\n").expect("invalid input");
-    let template = input.0.trim().chars().collect();
-    let rules: HashMap<(char, char), char> = input
-        .1
-        .trim()
-        .split('\n')
-        .map(|line| {
-            let terms = line.split_once(" -> ").expect("invalid line");
-            let mut pair_input = terms.0.chars();
-            (
-                (
-                    pair_input.next().expect("invalid rule"),
-                    pair_input.next().expect("invalid rule"),
-                ),
-                terms.1.chars().next().expect("invalid rule"),
-            )
-        })
-        .collect();
-    (template, rules)
+type Pair = (char, char);
+
+pub struct Input {
+    template: Vec<char>,
+    rules: HashMap<Pair, char>,
 }
 
-type Pair = (char, char);
+impl ParseInput<'_, { Day::Fourteen }> for AdventOfCode2021<{ Day::Fourteen }> {
+    type Parsed = Input;
+
+    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+        let input = input.trim().split_once("\n\n").expect("invalid input");
+        let template = input.0.trim().chars().collect();
+        let rules: HashMap<(char, char), char> = input
+            .1
+            .trim()
+            .split('\n')
+            .map(|line| {
+                let terms = line.split_once(" -> ").expect("invalid line");
+                let mut pair_input = terms.0.chars();
+                (
+                    (
+                        pair_input.next().expect("invalid rule"),
+                        pair_input.next().expect("invalid rule"),
+                    ),
+                    terms.1.chars().next().expect("invalid rule"),
+                )
+            })
+            .collect();
+        Input { template, rules }
+    }
+}
 
 fn run_polymerization(
     template: &[char],
-    rules: HashMap<(char, char), char>,
+    rules: &HashMap<(char, char), char>,
     steps: usize,
 ) -> usize {
     let mut pair_counts: Counter<Pair> =
@@ -54,19 +66,30 @@ fn run_polymerization(
     return char_counts.values().max().unwrap() - char_counts.values().min().unwrap() + 1;
 }
 
-pub fn main(input_path: &str) {
-    let input = read_to_string(input_path).expect("failed to read input");
-    let (template, rules) = parse_input(&input);
-    println!(
-        "Part 1: {}",
-        run_polymerization(&template, rules.clone(), 10)
-    );
-    println!("Part 2: {}", run_polymerization(&template, rules, 40));
+impl Solution<'_, { Day::Fourteen }, { Part::One }> for AdventOfCode2021<{ Day::Fourteen }> {
+    type Input = Input;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        run_polymerization(&input.template, &input.rules, 10)
+    }
+}
+
+impl Solution<'_, { Day::Fourteen }, { Part::Two }> for AdventOfCode2021<{ Day::Fourteen }> {
+    type Input = Input;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        run_polymerization(&input.template, &input.rules, 40)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::aoc::PartOneVerifier;
+    use crate::aoc::PartTwoVerifier;
+
     #[test]
     fn test() {
         let input = "NNCB
@@ -87,8 +110,8 @@ BB -> N
 BC -> B
 CC -> N
 CN -> C";
-        let (template, rules) = parse_input(input);
-        assert_eq!(run_polymerization(&template, rules.clone(), 10), 1588);
-        assert_eq!(run_polymerization(&template, rules, 40), 2188189693529);
+        let problem = super::AdventOfCode2021::<{ Day::Fourteen }>;
+        (&&&problem).test_part1(input, 1588);
+        (&&&problem).test_part2(input, 2188189693529);
     }
 }
