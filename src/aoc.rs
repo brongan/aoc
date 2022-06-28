@@ -68,7 +68,7 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
         let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
         let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(&self, &parsed_input);
         println!("Part One: {}", part1_output);
@@ -82,7 +82,7 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     default fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
         let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
 
         println!("Part One: {}", part1_output);
@@ -96,7 +96,7 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq,
 {
     fn test_part1(&'a self, input: &'a str, expected: U) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
         let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
         assert_eq!(part1_output, expected);
     }
@@ -109,7 +109,7 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq,
 {
     fn test_part2(&'a self, input: &'a str, expected: U) {
-        let input = <Self as ParseInput<DAY>>::parse_input(&self, input);
+        let input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
         let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(&self, &input);
         assert_eq!(output, expected);
     }

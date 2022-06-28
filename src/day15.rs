@@ -133,8 +133,8 @@ impl Solution<'_, { Day::Fifteen }, { Part::One }> for AdventOfCode2021<{ Day::F
     type Output = u32;
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
-        let (prev, path_cost) = djikstra(input).expect("Did not find solution");
-        print_map(input, &prev);
+        let (_prev, path_cost) = djikstra(input).expect("Did not find solution");
+        //print_map(input, &prev);
         path_cost
     }
 }
@@ -172,8 +172,8 @@ impl Solution<'_, { Day::Fifteen }, { Part::Two }> for AdventOfCode2021<{ Day::F
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
         let input = part2_extend(input.to_vec());
-        let (prev, path_cost) = djikstra(&input).expect("Did not find solution");
-        print_map(&input, &prev);
+        let (_prev, path_cost) = djikstra(&input).expect("Did not find solution");
+        //print_map(&input, &prev);
         path_cost
     }
 }

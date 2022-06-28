@@ -6,17 +6,6 @@ use std::{collections::HashSet, str::FromStr};
 
 use crate::point2d::Point2D;
 
-impl FromStr for Point2D<usize> {
-    type Err = std::string::ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let split = s.split_once(',').expect("Failed to find comma");
-        Ok(Point2D {
-            y: split.0.parse().expect("Failed to parse coordinate"),
-            x: split.1.parse().expect("Failed to parse coordinate"),
-        })
-    }
-}
-
 enum FoldInstruction {
     X(usize),
     Y(usize),
@@ -35,13 +24,13 @@ impl FromStr for FoldInstruction {
             "x" => FoldInstruction::X(
                 equation
                     .1
-                    .parse::<usize>()
+                    .parse()
                     .expect("failed to parse fold equation line"),
             ),
             "y" => FoldInstruction::Y(
                 equation
                     .1
-                    .parse::<usize>()
+                    .parse()
                     .expect("failed to parse fold equation line"),
             ),
             _ => panic!("bad equation"),
@@ -49,19 +38,20 @@ impl FromStr for FoldInstruction {
     }
 }
 
-type Points = Vec<Point2D<usize>>;
+type Point = Point2D<usize>;
+type Points = Vec<Point>;
 
-pub struct Input {
+pub struct Manual {
     points: Points,
     instructions: Vec<FoldInstruction>,
 }
 
 impl ParseInput<'_, { Day::Thirteen }> for AdventOfCode2021<{ Day::Thirteen }> {
-    type Parsed = Input;
+    type Parsed = Manual;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
         let input = input.trim().split_once("\n\n").expect("invalid input");
-        let points: Vec<Point2D<usize>> = input
+        let points: Vec<Point> = input
             .0
             .lines()
             .map(|line| Point2D::from_str(line.trim()).expect("Failed to parse point"))
@@ -74,7 +64,7 @@ impl ParseInput<'_, { Day::Thirteen }> for AdventOfCode2021<{ Day::Thirteen }> {
                 FoldInstruction::from_str(line.trim()).expect("Failed to parse instruction")
             })
             .collect();
-        Input {
+        Manual {
             points,
             instructions,
         }
@@ -86,15 +76,34 @@ fn fold(points: &mut Points, instruction: &FoldInstruction) {
         match *instruction {
             FoldInstruction::X(x) => {
                 if point.x > x {
-                    point.x = 2 * x - point.x
+                    debug_assert!(2 * x + 1 >= point.x, "x = {}, point.x = {}", x, point.x);
+                    point.x = 2 * x + 1 - point.x
                 }
             }
             FoldInstruction::Y(y) => {
                 if point.y > y {
-                    point.y = 2 * y - point.y
+                    debug_assert!(2 * y + 1 >= point.y, "y = {}, point.y = {}", y, point.y);
+                    point.y = 2 * y + 1 - point.y
                 }
             }
         }
+    }
+}
+
+impl Solution<'_, { Day::Thirteen }, { Part::One }> for AdventOfCode2021<{ Day::Thirteen }> {
+    type Input = Manual;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let mut points = input.points.clone();
+        fold(
+            &mut points,
+            input
+                .instructions
+                .first()
+                .expect("Need at least one instruction"),
+        );
+        HashSet::<Point>::from_iter(points.into_iter()).len()
     }
 }
 
@@ -114,39 +123,23 @@ fn print_paper(points: &Points) -> String {
     for point in points {
         output[point.x][point.y] = '#';
     }
-    output
+    format!("\n{}", output
         .into_iter()
         .map(|row| row.into_iter().collect::<String>())
-        .join("\n")
-}
-
-impl Solution<'_, { Day::Thirteen }, { Part::One }> for AdventOfCode2021<{ Day::Thirteen }> {
-    type Input = Input;
-    type Output = usize;
-
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        let mut points = input.points.clone();
-        fold(
-            &mut points,
-            input
-                .instructions
-                .first()
-                .expect("Need at least one instruction"),
-        );
-        HashSet::<Point2D<usize>>::from_iter(points.into_iter()).len()
-    }
+        .join("\n"))
 }
 
 impl Solution<'_, { Day::Thirteen }, { Part::Two }> for AdventOfCode2021<{ Day::Thirteen }> {
-    type Input = Input;
+    type Input = Manual;
     type Output = String;
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
+        let mut points = input.points.clone();
         input
             .instructions
             .iter()
-            .for_each(|instruction| fold(&mut input.points.clone(), instruction));
-        print_paper(&input.points)
+            .for_each(|instruction| fold(&mut points, instruction));
+        print_paper(&points)
     }
 }
 
