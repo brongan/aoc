@@ -1,7 +1,9 @@
 use std::fmt::Display;
+use num_enum::{TryFromPrimitive, IntoPrimitive};
 use strum_macros::EnumIter;
 
-#[derive(PartialEq, Eq, EnumIter)]
+#[derive(PartialEq, Eq, EnumIter, PartialOrd, Ord, TryFromPrimitive, IntoPrimitive, Debug, Clone, Copy)]
+#[repr(u8)]
 pub enum Day {
     One = 1,
     Two,
