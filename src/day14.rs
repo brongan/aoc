@@ -1,6 +1,5 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use std::collections::HashMap;
 
 use counter::Counter;
@@ -12,7 +11,7 @@ pub struct Input {
     rules: HashMap<Pair, char>,
 }
 
-impl ParseInput<'_, { Day::Fourteen }> for AdventOfCode2021<{ Day::Fourteen }> {
+impl ParseInput<'_, { Day::Day14 }> for AOC2021<{ Day::Day14 }> {
     type Parsed = Input;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -66,7 +65,7 @@ fn run_polymerization(
     return char_counts.values().max().unwrap() - char_counts.values().min().unwrap() + 1;
 }
 
-impl Solution<'_, { Day::Fourteen }, { Part::One }> for AdventOfCode2021<{ Day::Fourteen }> {
+impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2021<{ Day::Day14 }> {
     type Input = Input;
     type Output = usize;
 
@@ -75,7 +74,7 @@ impl Solution<'_, { Day::Fourteen }, { Part::One }> for AdventOfCode2021<{ Day::
     }
 }
 
-impl Solution<'_, { Day::Fourteen }, { Part::Two }> for AdventOfCode2021<{ Day::Fourteen }> {
+impl Solution<'_, { Day::Day14 }, { Part::Two }> for AOC2021<{ Day::Day14 }> {
     type Input = Input;
     type Output = usize;
 
@@ -91,7 +90,7 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "NNCB
 
 CH -> B
@@ -110,8 +109,8 @@ BB -> N
 BC -> B
 CC -> N
 CN -> C";
-        let problem = super::AdventOfCode2021::<{ Day::Fourteen }>;
-        (&&&problem).test_part1(input, 1588);
-        (&&&problem).test_part2(input, 2188189693529);
+        let problem = super::AOC2021::<{ Day::Day14 }>;
+        (&&&problem).test_part1(input, 1588)?;
+        (&&&problem).test_part2(input, 2188189693529)
     }
 }

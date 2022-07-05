@@ -1,8 +1,7 @@
 use std::str::FromStr;
 
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 #[derive(PartialEq)]
 pub enum SyntaxScore {
@@ -10,7 +9,7 @@ pub enum SyntaxScore {
     Incomplete(Vec<char>),
 }
 
-impl ParseInput<'_, { Day::Ten }> for AdventOfCode2021<{ Day::Ten }> {
+impl ParseInput<'_, { Day::Day10 }> for AOC2021<{ Day::Day10 }> {
     type Parsed = Vec<SyntaxScore>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -84,7 +83,7 @@ impl SyntaxScore {
     }
 }
 
-impl Solution<'_, { Day::Ten }, { Part::One }> for AdventOfCode2021<{ Day::Ten }> {
+impl Solution<'_, { Day::Day10 }, { Part::One }> for AOC2021<{ Day::Day10 }> {
     type Input = Vec<SyntaxScore>;
     type Output = usize;
 
@@ -98,7 +97,7 @@ impl Solution<'_, { Day::Ten }, { Part::One }> for AdventOfCode2021<{ Day::Ten }
     }
 }
 
-impl Solution<'_, { Day::Ten }, { Part::Two }> for AdventOfCode2021<{ Day::Ten }> {
+impl Solution<'_, { Day::Day10 }, { Part::Two }> for AOC2021<{ Day::Day10 }> {
     type Input = Vec<SyntaxScore>;
     type Output = usize;
 
@@ -121,7 +120,7 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>
@@ -132,8 +131,8 @@ mod tests {
 [<(<(<(<{}))><([]([]()
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]";
-        let problem = super::AdventOfCode2021::<{ Day::Ten }>;
-        (&&&problem).test_part1(input, 26397);
-        (&&&problem).test_part2(input, 288957);
+        let problem = super::AOC2021::<{ Day::Day10 }>;
+        (&&&problem).test_part1(input, 26397)?;
+        (&&&problem).test_part2(input, 288957)
     }
 }

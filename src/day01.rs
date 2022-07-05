@@ -1,10 +1,9 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 use itertools::zip;
 
-impl ParseInput<'_, { Day::One }> for AdventOfCode2021<{ Day::One }> {
+impl ParseInput<'_, { Day::Day1 }> for AOC2021<{ Day::Day1 }> {
     type Parsed = Vec<u32>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -16,7 +15,7 @@ impl ParseInput<'_, { Day::One }> for AdventOfCode2021<{ Day::One }> {
     }
 }
 
-impl Solution<'_, { Day::One }, { Part::One }> for AdventOfCode2021<{ Day::One }> {
+impl Solution<'_, { Day::Day1 }, { Part::One }> for AOC2021<{ Day::Day1 }> {
     type Input = Vec<u32>;
     type Output = usize;
 
@@ -27,7 +26,7 @@ impl Solution<'_, { Day::One }, { Part::One }> for AdventOfCode2021<{ Day::One }
     }
 }
 
-impl Solution<'_, { Day::One }, { Part::Two }> for AdventOfCode2021<{ Day::One }> {
+impl Solution<'_, { Day::Day1 }, { Part::Two }> for AOC2021<{ Day::Day1 }> {
     type Input = Vec<u32>;
     type Output = usize;
 

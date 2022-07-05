@@ -1,18 +1,22 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use std::str::FromStr;
 
+#[allow(dead_code)]
 pub struct Entry {
     signal: Vec<String>,
     output: Vec<String>,
 }
 
-impl ParseInput<'_, { Day::Eight }> for AdventOfCode2021<{ Day::Eight }> {
+impl ParseInput<'_, { Day::Day8 }> for AOC2021<{ Day::Day8 }> {
     type Parsed = Vec<Entry>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input.lines().map(Entry::from_str).map(|r| r.expect("failed to parse entry")).collect()
+        input
+            .lines()
+            .map(Entry::from_str)
+            .map(|r| r.expect("failed to parse entry"))
+            .collect()
     }
 }
 
@@ -32,8 +36,7 @@ impl FromStr for Entry {
     }
 }
 
-
-impl Solution<'_, { Day::Eight }, { Part::One }> for AdventOfCode2021<{ Day::Eight }> {
+impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2021<{ Day::Day8 }> {
     type Input = Vec<Entry>;
     type Output = usize;
 

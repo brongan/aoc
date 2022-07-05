@@ -1,9 +1,8 @@
 use std::cmp::{max, Ordering};
 use std::vec;
 
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use crate::point2d::Point2D;
 
 type VentLine = (Point2D<i32>, Point2D<i32>);
@@ -52,7 +51,7 @@ fn seafloor_from_lines(
     seafloor
 }
 
-impl ParseInput<'_, { Day::Five }> for AdventOfCode2021<{ Day::Five }> {
+impl ParseInput<'_, { Day::Day5 }> for AOC2021<{ Day::Day5 }> {
     type Parsed = Vec<VentLine>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -64,7 +63,7 @@ fn part1_filter(line: VentLine) -> bool {
     line.0.x == line.1.x || line.0.y == line.1.y
 }
 
-impl Solution<'_, { Day::Five }, { Part::One }> for AdventOfCode2021<{ Day::Five }> {
+impl Solution<'_, { Day::Day5 }, { Part::One }> for AOC2021<{ Day::Day5 }> {
     type Input = Vec<VentLine>;
     type Output = usize;
 
@@ -74,7 +73,7 @@ impl Solution<'_, { Day::Five }, { Part::One }> for AdventOfCode2021<{ Day::Five
     }
 }
 
-impl Solution<'_, { Day::Five }, { Part::Two }> for AdventOfCode2021<{ Day::Five }> {
+impl Solution<'_, { Day::Day5 }, { Part::Two }> for AOC2021<{ Day::Day5 }> {
     type Input = Vec<VentLine>;
     type Output = usize;
 
@@ -108,9 +107,9 @@ mod tests {
     }
 
     #[test]
-    fn test() {
-        let problem = super::AdventOfCode2021::<{ Day::Five }>;
-        (&&&problem).test_part1(&input(), 5);
-        (&&&problem).test_part2(&input(), 12);
+    fn test() -> Result<(), String> {
+        let problem = super::AOC2021::<{ Day::Day5 }>;
+        (&&&problem).test_part1(&input(), 5)?;
+        (&&&problem).test_part2(&input(), 12)
     }
 }

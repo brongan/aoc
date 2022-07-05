@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use std::fmt::Debug;
+use std::str::FromStr;
 
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct Point2D<T> {
@@ -7,8 +7,10 @@ pub struct Point2D<T> {
     pub y: T,
 }
 
-impl<T> FromStr for Point2D<T> 
-where T: std::str::FromStr, <T as std::str::FromStr>::Err: std::fmt::Debug
+impl<T> FromStr for Point2D<T>
+where
+    T: std::str::FromStr,
+    <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
     type Err = std::string::ParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

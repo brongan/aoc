@@ -1,11 +1,10 @@
 use std::collections::{HashSet, VecDeque};
 
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use crate::point2d::Point2D;
 
-impl ParseInput<'_, { Day::Nine }> for AdventOfCode2021<{ Day::Nine }> {
+impl ParseInput<'_, { Day::Day9 }> for AOC2021<{ Day::Day9 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -33,7 +32,7 @@ fn get_low_points(height_map: &[Vec<u32>]) -> Vec<Point2D<usize>> {
                 .iter()
                 .all(|other| height_map[other.x][other.y] > height_map[x][y])
             {
-                ret.push(Point2D {x, y});
+                ret.push(Point2D { x, y });
             }
         }
     }
@@ -46,7 +45,10 @@ fn get_neighbors(i: i32, j: i32, num_rows: i32, num_col: i32) -> Vec<Point2D<usi
         let new_x = i + dx;
         let new_y = j + dy;
         if new_x >= 0 && new_x < num_rows && new_y >= 0 && new_y < num_col {
-            neighbors.push(Point2D{x: new_x as usize, y: new_y as usize})
+            neighbors.push(Point2D {
+                x: new_x as usize,
+                y: new_y as usize,
+            })
         }
     }
     neighbors
@@ -77,7 +79,7 @@ fn calculate_basin_size(height_map: &[Vec<u32>], low_point: Point2D<usize>) -> u
     ret
 }
 
-impl Solution<'_, { Day::Nine }, { Part::One }> for AdventOfCode2021<{ Day::Nine }> {
+impl Solution<'_, { Day::Day9 }, { Part::One }> for AOC2021<{ Day::Day9 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
@@ -89,7 +91,7 @@ impl Solution<'_, { Day::Nine }, { Part::One }> for AdventOfCode2021<{ Day::Nine
     }
 }
 
-impl Solution<'_, { Day::Nine }, { Part::Two }> for AdventOfCode2021<{ Day::Nine }> {
+impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2021<{ Day::Day9 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
@@ -111,14 +113,14 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "2199943210
 3987894921
 9856789892
 8767896789
 9899965678";
-        let problem = super::AdventOfCode2021::<{ Day::Nine }>;
-        (&&&problem).test_part1(input, 15);
-        (&&&problem).test_part2(input, 1134);
+        let problem = super::AOC2021::<{ Day::Day9 }>;
+        (&&&problem).test_part1(input, 15)?;
+        (&&&problem).test_part2(input, 1134)
     }
 }

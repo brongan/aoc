@@ -18,8 +18,8 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
-//mod day16;
-//mod day17;
+mod day16;
+mod day17;
 //mod day18;
 //mod day19;
 //mod day20;
@@ -33,14 +33,14 @@ mod point2d;
 #[macro_use]
 mod aoc;
 
-use std::fs::read_to_string;
-use strum::IntoEnumIterator;
 use std::collections::BTreeMap;
 use std::convert::TryFrom;
+use std::fs::read_to_string;
+use strum::IntoEnumIterator;
 
 use crate::aoc::{Day, SolutionRunner};
 
-pub struct AdventOfCode2021<const DAY: Day>;
+pub struct AOC2021<const DAY: Day>;
 
 fn input(day: &Day) -> String {
     let day: u8 = (*day).into();
@@ -49,22 +49,74 @@ fn input(day: &Day) -> String {
 
 fn main() {
     let mut solvers: BTreeMap<Day, Box<dyn Fn(&str) -> ()>> = BTreeMap::new();
-    solvers.insert(Day::One, Box::new(|input| run!(AdventOfCode2021::<{ Day::One }>, input)));
-    solvers.insert(Day::Two, Box::new(|input| run!(AdventOfCode2021::<{ Day::Two }>, input)));
-    solvers.insert(Day::Three, Box::new(|input| run!(AdventOfCode2021::<{ Day::Three }>, input)));
-    solvers.insert(Day::Four, Box::new(|input| run!(AdventOfCode2021::<{ Day::Four }>, input)));
-    solvers.insert(Day::Five, Box::new(|input| run!(AdventOfCode2021::<{ Day::Five }>, input)));
-    solvers.insert(Day::Six, Box::new(|input| run!(AdventOfCode2021::<{ Day::Six }>, input)));
-    solvers.insert(Day::Seven, Box::new(|input| run!(AdventOfCode2021::<{ Day::Seven }>, input)));
-    solvers.insert(Day::Eight, Box::new(|input| run!(AdventOfCode2021::<{ Day::Eight }>, input)));
-    solvers.insert(Day::Nine, Box::new(|input| run!(AdventOfCode2021::<{ Day::Nine }>, input)));
-    solvers.insert(Day::Ten, Box::new(|input| run!(AdventOfCode2021::<{ Day::Ten }>, input)));
-    solvers.insert(Day::Eleven, Box::new(|input| run!(AdventOfCode2021::<{ Day::Eleven }>, input)));
-    solvers.insert(Day::Twelve, Box::new(|input| run!(AdventOfCode2021::<{ Day::Twelve }>, input)));
-    solvers.insert(Day::Thirteen, Box::new(|input| run!(AdventOfCode2021::<{ Day::Thirteen }>, input)));
-    solvers.insert(Day::Fourteen, Box::new(|input| run!(AdventOfCode2021::<{ Day::Fourteen }>, input)));
-    solvers.insert(Day::Fifteen, Box::new(|input| run!(AdventOfCode2021::<{ Day::Fifteen }>, input)));
-    //solvers.insert(Day::Sixteen, Box::new(|input| run!(AdventOfCode2021::<{ Day::Sixteen }>, input)));
+    solvers.insert(
+        Day::Day1,
+        Box::new(|input| run!(AOC2021::<{ Day::Day1 }>, input)),
+    );
+    solvers.insert(
+        Day::Day2,
+        Box::new(|input| run!(AOC2021::<{ Day::Day2 }>, input)),
+    );
+    solvers.insert(
+        Day::Day3,
+        Box::new(|input| run!(AOC2021::<{ Day::Day3 }>, input)),
+    );
+    solvers.insert(
+        Day::Day4,
+        Box::new(|input| run!(AOC2021::<{ Day::Day4 }>, input)),
+    );
+    solvers.insert(
+        Day::Day5,
+        Box::new(|input| run!(AOC2021::<{ Day::Day5 }>, input)),
+    );
+    solvers.insert(
+        Day::Day6,
+        Box::new(|input| run!(AOC2021::<{ Day::Day6 }>, input)),
+    );
+    solvers.insert(
+        Day::Day7,
+        Box::new(|input| run!(AOC2021::<{ Day::Day7 }>, input)),
+    );
+    solvers.insert(
+        Day::Day8,
+        Box::new(|input| run!(AOC2021::<{ Day::Day8 }>, input)),
+    );
+    solvers.insert(
+        Day::Day9,
+        Box::new(|input| run!(AOC2021::<{ Day::Day9 }>, input)),
+    );
+    solvers.insert(
+        Day::Day10,
+        Box::new(|input| run!(AOC2021::<{ Day::Day10 }>, input)),
+    );
+    solvers.insert(
+        Day::Day11,
+        Box::new(|input| run!(AOC2021::<{ Day::Day11 }>, input)),
+    );
+    solvers.insert(
+        Day::Day12,
+        Box::new(|input| run!(AOC2021::<{ Day::Day12 }>, input)),
+    );
+    solvers.insert(
+        Day::Day13,
+        Box::new(|input| run!(AOC2021::<{ Day::Day13 }>, input)),
+    );
+    solvers.insert(
+        Day::Day14,
+        Box::new(|input| run!(AOC2021::<{ Day::Day14 }>, input)),
+    );
+    solvers.insert(
+        Day::Day15,
+        Box::new(|input| run!(AOC2021::<{ Day::Day15 }>, input)),
+    );
+    solvers.insert(
+        Day::Day16,
+        Box::new(|input| run!(AOC2021::<{ Day::Day16 }>, input)),
+    );
+    solvers.insert(
+        Day::Day17,
+        Box::new(|input| run!(AOC2021::<{ Day::Day17 }>, input)),
+    );
 
     if let Some(day) = std::env::args().skip(1).next() {
         let day_num = day.parse::<u8>().expect("unable to parse day");
@@ -72,7 +124,6 @@ fn main() {
         eprintln!("Running day: {}", day_num);
         let solver = solvers.get(&day).expect("day not implemented");
         solver(&input(&day));
-
     } else {
         for day in Day::iter() {
             if let Some(solver) = solvers.get(&day).take() {

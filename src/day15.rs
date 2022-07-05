@@ -1,6 +1,5 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
 use std::collections::HashSet;
@@ -10,12 +9,12 @@ use colored::Colorize;
 
 type Point = (usize, usize);
 
-impl ParseInput<'_, { Day::Fifteen }> for AdventOfCode2021<{ Day::Fifteen }> {
+impl ParseInput<'_, { Day::Day15 }> for AOC2021<{ Day::Day15 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
         input
-            .split('\n')
+            .lines()
             .map(|line| {
                 line.trim()
                     .chars()
@@ -114,6 +113,7 @@ fn djikstra(map: &[Vec<u32>]) -> Option<(HashSet<Point>, u32)> {
     None
 }
 
+#[allow(dead_code)]
 fn print_map(map: &[Vec<u32>], prev: &HashSet<Point>) {
     let size = map.len();
     for (i, row) in map.iter().enumerate().take(size) {
@@ -128,7 +128,7 @@ fn print_map(map: &[Vec<u32>], prev: &HashSet<Point>) {
     }
 }
 
-impl Solution<'_, { Day::Fifteen }, { Part::One }> for AdventOfCode2021<{ Day::Fifteen }> {
+impl Solution<'_, { Day::Day15 }, { Part::One }> for AOC2021<{ Day::Day15 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
@@ -166,7 +166,7 @@ fn part2_extend(map: Vec<Vec<u32>>) -> Vec<Vec<u32>> {
     ret
 }
 
-impl Solution<'_, { Day::Fifteen }, { Part::Two }> for AdventOfCode2021<{ Day::Fifteen }> {
+impl Solution<'_, { Day::Day15 }, { Part::Two }> for AOC2021<{ Day::Day15 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
@@ -185,7 +185,7 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "1163751742
 1381373672
 2136511328
@@ -246,13 +246,13 @@ mod tests {
 75698651748671976285978218739618932984172914319528
 56475739656758684176786979528789718163989182927419
 67554889357866599146897761125791887223681299833479";
-        let problem = super::AdventOfCode2021::<{ Day::Fifteen }>;
+        let problem = super::AOC2021::<{ Day::Day15 }>;
         let parsed_input = (&&&problem).parse_input(input);
-        (&&&problem).test_part1(input, 40);
+        (&&&problem).test_part1(input, 40)?;
 
         let expected_extended_input = (&&&problem).parse_input(expected_extended_input);
         let extended_input = part2_extend(parsed_input);
         assert_eq!(extended_input, expected_extended_input);
-        (&&&problem).test_part2(input, 315);
+        (&&&problem).test_part2(input, 315)
     }
 }

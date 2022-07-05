@@ -1,6 +1,5 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use itertools::Itertools;
 use std::{collections::HashSet, str::FromStr};
 
@@ -46,7 +45,7 @@ pub struct Manual {
     instructions: Vec<FoldInstruction>,
 }
 
-impl ParseInput<'_, { Day::Thirteen }> for AdventOfCode2021<{ Day::Thirteen }> {
+impl ParseInput<'_, { Day::Day13 }> for AOC2021<{ Day::Day13 }> {
     type Parsed = Manual;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -76,34 +75,15 @@ fn fold(points: &mut Points, instruction: &FoldInstruction) {
         match *instruction {
             FoldInstruction::X(x) => {
                 if point.x > x {
-                    debug_assert!(2 * x + 1 >= point.x, "x = {}, point.x = {}", x, point.x);
-                    point.x = 2 * x + 1 - point.x
+                    point.x = 2 * x - point.x
                 }
             }
             FoldInstruction::Y(y) => {
                 if point.y > y {
-                    debug_assert!(2 * y + 1 >= point.y, "y = {}, point.y = {}", y, point.y);
-                    point.y = 2 * y + 1 - point.y
+                    point.y = 2 * y - point.y
                 }
             }
         }
-    }
-}
-
-impl Solution<'_, { Day::Thirteen }, { Part::One }> for AdventOfCode2021<{ Day::Thirteen }> {
-    type Input = Manual;
-    type Output = usize;
-
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        let mut points = input.points.clone();
-        fold(
-            &mut points,
-            input
-                .instructions
-                .first()
-                .expect("Need at least one instruction"),
-        );
-        HashSet::<Point>::from_iter(points.into_iter()).len()
     }
 }
 
@@ -119,17 +99,38 @@ fn print_paper(points: &Points) -> String {
         .map(|p| p.y)
         .max()
         .expect("need a point after folding");
-    let mut output: Vec<Vec<char>> = vec![vec!['.'; max_y + 1]; max_x + 1];
+    let mut output: Vec<Vec<char>> = vec![vec!['.'; max_x + 1]; max_y + 1];
     for point in points {
-        output[point.x][point.y] = '#';
+        output[point.y][point.x] = '#';
     }
-    format!("\n{}", output
-        .into_iter()
-        .map(|row| row.into_iter().collect::<String>())
-        .join("\n"))
+    format!(
+        "\n{}",
+        output
+            .into_iter()
+            .map(|row| row.into_iter().collect::<String>())
+            .join("\n")
+    )
 }
 
-impl Solution<'_, { Day::Thirteen }, { Part::Two }> for AdventOfCode2021<{ Day::Thirteen }> {
+impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2021<{ Day::Day13 }> {
+    type Input = Manual;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let mut points = input.points.clone();
+        fold(
+            &mut points,
+            input
+                .instructions
+                .first()
+                .expect("Need at least one instruction"),
+        );
+
+        HashSet::<Point>::from_iter(points.into_iter()).len()
+    }
+}
+
+impl Solution<'_, { Day::Day13 }, { Part::Two }> for AOC2021<{ Day::Day13 }> {
     type Input = Manual;
     type Output = String;
 
@@ -147,10 +148,10 @@ impl Solution<'_, { Day::Thirteen }, { Part::Two }> for AdventOfCode2021<{ Day::
 mod tests {
     use super::*;
     use crate::aoc::PartOneVerifier;
+    use crate::aoc::PartTwoVerifier;
 
-    #[test]
-    fn test() {
-        let input = "6,10
+    const EXAMPLE_INPUT: &str = "
+6,10
 0,14
 9,10
 0,3
@@ -171,7 +172,62 @@ mod tests {
 
 fold along y=7
 fold along x=5";
-        let problem = super::AdventOfCode2021::<{ Day::Thirteen }>;
-        (&&&problem).test_part1(input, 17);
+
+    const EXAMPLE_PART2_RESULT: &str = "
+#####
+#...#
+#...#
+#...#
+#####";
+
+    #[test]
+    fn test_example() {
+        let problem = super::AOC2021::<{ Day::Day13 }>;
+        let mut parsed = (&&&problem).parse_input(EXAMPLE_INPUT);
+        let expected_paper = "
+...#..#..#.
+....#......
+...........
+#..........
+...#....#.#
+...........
+...........
+...........
+...........
+...........
+.#....#.##.
+....#......
+......#...#
+#..........
+#.#........";
+        assert_eq!(print_paper(&parsed.points).trim(), expected_paper.trim());
+
+        let expected_after_fold = "
+#.##..#..#.
+#...#......
+......#...#
+#...#......
+.#.#..#.###";
+        fold(&mut parsed.points, &parsed.instructions[0]);
+        eprintln!("Actual After Fold 1:\n{}", print_paper(&parsed.points));
+        assert_eq!(
+            print_paper(&parsed.points).trim(),
+            expected_after_fold.trim()
+        );
+
+        fold(&mut parsed.points, &parsed.instructions[1]);
+        eprintln!("Actual After Fold 2:\n{}", print_paper(&parsed.points));
+        assert_eq!(
+            print_paper(&parsed.points).trim(),
+            EXAMPLE_PART2_RESULT.trim().to_owned()
+        );
+    }
+
+    #[test]
+    fn test() -> Result<(), String> {
+        let problem = super::AOC2021::<{ Day::Day13 }>;
+
+        (&&&problem).test_part1(EXAMPLE_INPUT, 17)?;
+        (&&&problem).test_part2(EXAMPLE_INPUT, format!("\n{}", EXAMPLE_PART2_RESULT.trim()))
     }
 }

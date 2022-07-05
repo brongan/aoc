@@ -1,13 +1,12 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 pub struct Entry {
     dir: String,
     dist: u32,
 }
 
-impl ParseInput<'_, { Day::Two }> for AdventOfCode2021<{ Day::Two }> {
+impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
     type Parsed = Vec<Entry>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -32,7 +31,7 @@ impl ParseInput<'_, { Day::Two }> for AdventOfCode2021<{ Day::Two }> {
     }
 }
 
-impl Solution<'_, { Day::Two }, { Part::One }> for AdventOfCode2021<{ Day::Two }> {
+impl Solution<'_, { Day::Day2 }, { Part::One }> for AOC2021<{ Day::Day2 }> {
     type Input = Vec<Entry>;
     type Output = u32;
 
@@ -58,7 +57,7 @@ impl Solution<'_, { Day::Two }, { Part::One }> for AdventOfCode2021<{ Day::Two }
     }
 }
 
-impl Solution<'_, { Day::Two }, { Part::Two }> for AdventOfCode2021<{ Day::Two }> {
+impl Solution<'_, { Day::Day2 }, { Part::Two }> for AOC2021<{ Day::Day2 }> {
     type Input = Vec<Entry>;
     type Output = u32;
 
