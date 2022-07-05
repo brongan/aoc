@@ -1,6 +1,5 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 fn most_common_elements(lines: &[String]) -> Vec<char> {
     (0..lines[0].len())
@@ -19,7 +18,7 @@ fn most_common_elements(lines: &[String]) -> Vec<char> {
         .collect()
 }
 
-impl ParseInput<'_, { Day::Three }> for AdventOfCode2021<{ Day::Three }> {
+impl ParseInput<'_, { Day::Day3 }> for AOC2021<{ Day::Day3 }> {
     type Parsed = Vec<String>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -27,7 +26,7 @@ impl ParseInput<'_, { Day::Three }> for AdventOfCode2021<{ Day::Three }> {
     }
 }
 
-impl Solution<'_, { Day::Three }, { Part::One }> for AdventOfCode2021<{ Day::Three }> {
+impl Solution<'_, { Day::Day3 }, { Part::One }> for AOC2021<{ Day::Day3 }> {
     type Input = Vec<String>;
     type Output = u32;
 
@@ -47,7 +46,7 @@ impl Solution<'_, { Day::Three }, { Part::One }> for AdventOfCode2021<{ Day::Thr
     }
 }
 
-impl Solution<'_, { Day::Three }, { Part::Two }> for AdventOfCode2021<{ Day::Three }> {
+impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2021<{ Day::Day3 }> {
     type Input = Vec<String>;
     type Output = u32;
 
@@ -88,7 +87,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_pt_2() {
+    fn test_pt_2() -> Result<(), String> {
         let input: String = "00100
             11110
             10110
@@ -105,7 +104,7 @@ mod tests {
             .split_whitespace()
             .into_iter()
             .join("\n");
-        let problem = super::AdventOfCode2021::<{ Day::Three }>;
+        let problem = super::AOC2021::<{ Day::Day3 }>;
         (&&&problem).test_part2(&input, 230)
     }
 }

@@ -1,8 +1,7 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
-impl ParseInput<'_, { Day::Six }> for AdventOfCode2021<{ Day::Six }> {
+impl ParseInput<'_, { Day::Day6 }> for AOC2021<{ Day::Day6 }> {
     type Parsed = [u64; 9];
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -30,7 +29,7 @@ fn solve(mut counts: [u64; 9], num_iterations: u32) -> u64 {
     counts.iter().sum()
 }
 
-impl Solution<'_, { Day::Six }, { Part::One }> for AdventOfCode2021<{ Day::Six }> {
+impl Solution<'_, { Day::Day6 }, { Part::One }> for AOC2021<{ Day::Day6 }> {
     type Input = [u64; 9];
     type Output = u64;
 
@@ -39,7 +38,7 @@ impl Solution<'_, { Day::Six }, { Part::One }> for AdventOfCode2021<{ Day::Six }
     }
 }
 
-impl Solution<'_, { Day::Six }, { Part::Two }> for AdventOfCode2021<{ Day::Six }> {
+impl Solution<'_, { Day::Day6 }, { Part::Two }> for AOC2021<{ Day::Day6 }> {
     type Input = [u64; 9];
     type Output = u64;
 
@@ -55,9 +54,9 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
-        let problem = super::AdventOfCode2021::<{ Day::Six }>;
-        (&&&problem).test_part1("3,4,3,1,2", 5934);
-        (&&&problem).test_part2("3,4,3,1,2", 26984457539);
+    fn test() -> Result<(), String> {
+        let problem = super::AOC2021::<{ Day::Day6 }>;
+        (&&&problem).test_part1("3,4,3,1,2", 5934)?;
+        (&&&problem).test_part2("3,4,3,1,2", 26984457539)
     }
 }

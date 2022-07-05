@@ -1,9 +1,8 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use std::collections::HashSet;
 
-impl ParseInput<'_, { Day::Eleven }> for AdventOfCode2021<{ Day::Eleven }> {
+impl ParseInput<'_, { Day::Day11 }> for AOC2021<{ Day::Day11 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -39,7 +38,7 @@ fn get_neighbors(i: i32, j: i32, num_rows: i32, num_col: i32) -> Vec<(usize, usi
     neighbors
 }
 
-impl Solution<'_, { Day::Eleven }, { Part::One }> for AdventOfCode2021<{ Day::Eleven }> {
+impl Solution<'_, { Day::Day11 }, { Part::One }> for AOC2021<{ Day::Day11 }> {
     type Input = Vec<Vec<u32>>;
     type Output = usize;
 
@@ -88,7 +87,7 @@ fn step(energy_levels: &mut Vec<Vec<u32>>) -> usize {
     on_cooldown.len()
 }
 
-impl Solution<'_, { Day::Eleven }, { Part::Two }> for AdventOfCode2021<{ Day::Eleven }> {
+impl Solution<'_, { Day::Day11 }, { Part::Two }> for AOC2021<{ Day::Day11 }> {
     type Input = Vec<Vec<u32>>;
     type Output = usize;
 
@@ -110,7 +109,7 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "5483143223
 2745854711
 5264556173
@@ -121,8 +120,8 @@ mod tests {
 6882881134
 4846848554
 5283751526";
-        let problem = super::AdventOfCode2021::<{ Day::Eleven }>;
-        (&&&problem).test_part1(input, 1656);
-        (&&&problem).test_part2(input, 195);
+        let problem = super::AOC2021::<{ Day::Day11 }>;
+        (&&&problem).test_part1(input, 1656)?;
+        (&&&problem).test_part2(input, 195)
     }
 }

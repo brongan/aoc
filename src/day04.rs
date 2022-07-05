@@ -1,9 +1,8 @@
 use std::fmt::Debug;
 use std::str::FromStr;
 
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 #[derive(Default, Copy, Clone)]
 struct BingoElement {
@@ -101,7 +100,7 @@ impl FromStr for BingoGame {
     }
 }
 
-impl ParseInput<'_, { Day::Four }> for AdventOfCode2021<{ Day::Four }> {
+impl ParseInput<'_, { Day::Day4 }> for AOC2021<{ Day::Day4 }> {
     type Parsed = BingoGame;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -109,7 +108,7 @@ impl ParseInput<'_, { Day::Four }> for AdventOfCode2021<{ Day::Four }> {
     }
 }
 
-impl Solution<'_, { Day::Four }, { Part::One }> for AdventOfCode2021<{ Day::Four }> {
+impl Solution<'_, { Day::Day4 }, { Part::One }> for AOC2021<{ Day::Day4 }> {
     type Input = BingoGame;
     type Output = u32;
 
@@ -128,7 +127,7 @@ impl Solution<'_, { Day::Four }, { Part::One }> for AdventOfCode2021<{ Day::Four
     }
 }
 
-impl Solution<'_, { Day::Four }, { Part::Two }> for AdventOfCode2021<{ Day::Four }> {
+impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
     type Input = BingoGame;
     type Output = u32;
 
@@ -217,9 +216,9 @@ mod tests {
     }
 
     #[test]
-    fn test() {
-        let problem = super::AdventOfCode2021::<{ Day::Four }>;
-        (&&&problem).test_part1(&input(), 4512);
-        (&&&problem).test_part2(&input(), 1924);
+    fn test() -> Result<(), String> {
+        let problem = super::AOC2021::<{ Day::Day4 }>;
+        (&&&problem).test_part1(&input(), 4512)?;
+        (&&&problem).test_part2(&input(), 1924)
     }
 }

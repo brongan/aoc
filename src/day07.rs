@@ -1,9 +1,8 @@
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use std::ops::Range;
 
-impl ParseInput<'_, { Day::Seven }> for AdventOfCode2021<{ Day::Seven }> {
+impl ParseInput<'_, { Day::Day7 }> for AOC2021<{ Day::Day7 }> {
     type Parsed = Vec<usize>;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -15,7 +14,7 @@ impl ParseInput<'_, { Day::Seven }> for AdventOfCode2021<{ Day::Seven }> {
     }
 }
 
-impl Solution<'_, { Day::Seven }, { Part::One }> for AdventOfCode2021<{ Day::Seven }> {
+impl Solution<'_, { Day::Day7 }, { Part::One }> for AOC2021<{ Day::Day7 }> {
     type Input = Vec<usize>;
     type Output = usize;
 
@@ -32,7 +31,7 @@ impl Solution<'_, { Day::Seven }, { Part::One }> for AdventOfCode2021<{ Day::Sev
     }
 }
 
-impl Solution<'_, { Day::Seven }, { Part::Two }> for AdventOfCode2021<{ Day::Seven }> {
+impl Solution<'_, { Day::Day7 }, { Part::Two }> for AOC2021<{ Day::Day7 }> {
     type Input = Vec<usize>;
     type Output = usize;
 
@@ -62,9 +61,9 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
-        let problem = super::AdventOfCode2021::<{ Day::Seven }>;
-        (&&&problem).test_part1("16,1,2,0,4,2,7,1,2,14", 37);
-        (&&&problem).test_part2("16,1,2,0,4,2,7,1,2,14", 168);
+    fn test() -> Result<(), String> {
+        let problem = super::AOC2021::<{ Day::Day7 }>;
+        (&&&problem).test_part1("16,1,2,0,4,2,7,1,2,14", 37)?;
+        (&&&problem).test_part2("16,1,2,0,4,2,7,1,2,14", 168)
     }
 }

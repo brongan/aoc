@@ -3,9 +3,8 @@ use std::{
     str::FromStr,
 };
 
-use super::AdventOfCode2021;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Part, Solution};
+use super::AOC2021;
+use crate::aoc::{Day, ParseInput, Part, Solution};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 enum Node {
@@ -122,7 +121,7 @@ impl FromStr for CaveGraph {
     }
 }
 
-impl ParseInput<'_, { Day::Twelve }> for AdventOfCode2021<{ Day::Twelve }> {
+impl ParseInput<'_, { Day::Day12 }> for AOC2021<{ Day::Day12 }> {
     type Parsed = CaveGraph;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -130,7 +129,7 @@ impl ParseInput<'_, { Day::Twelve }> for AdventOfCode2021<{ Day::Twelve }> {
     }
 }
 
-impl Solution<'_, { Day::Twelve }, { Part::One }> for AdventOfCode2021<{ Day::Twelve }> {
+impl Solution<'_, { Day::Day12 }, { Part::One }> for AOC2021<{ Day::Day12 }> {
     type Input = CaveGraph;
     type Output = usize;
 
@@ -139,7 +138,7 @@ impl Solution<'_, { Day::Twelve }, { Part::One }> for AdventOfCode2021<{ Day::Tw
     }
 }
 
-impl Solution<'_, { Day::Twelve }, { Part::Two }> for AdventOfCode2021<{ Day::Twelve }> {
+impl Solution<'_, { Day::Day12 }, { Part::Two }> for AOC2021<{ Day::Day12 }> {
     type Input = CaveGraph;
     type Output = usize;
 
@@ -155,7 +154,7 @@ mod tests {
     use crate::aoc::PartTwoVerifier;
 
     #[test]
-    fn test() {
+    fn test() -> Result<(), String> {
         let input = "fs-end
 he-DX
 fs-he
@@ -174,8 +173,8 @@ he-WI
 zg-he
 pj-fs
 start-RW";
-        let problem = super::AdventOfCode2021::<{ Day::Twelve }>;
-        (&&&problem).test_part1(input, 226);
-        (&&&problem).test_part2(input, 3509);
+        let problem = super::AOC2021::<{ Day::Day12 }>;
+        (&&&problem).test_part1(input, 226)?;
+        (&&&problem).test_part2(input, 3509)
     }
 }
