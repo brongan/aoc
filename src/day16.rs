@@ -2,6 +2,7 @@ use nom::IResult;
 use nom::bytes::complete::take_while_m_n;
 use nom::combinator::map_res;
 use nom::multi::many1;
+use num_enum::TryFromPrimitive;
 
 use super::AOC2021;
 use crate::aoc::{Day, Part, Solution, ParseInput};
@@ -87,88 +88,92 @@ impl BitIterator {
     }
 }
 
-#[allow(dead_code)]
+type Version = u8;
+
+#[derive(Debug, PartialEq, TryFromPrimitive)]
+#[repr(u8)]
+pub enum Type {
+    Sum = 0,
+    Product = 1,
+    Minimum = 2,
+    Maximum = 3,
+    Literal = 4,
+    GreaterThan = 5,
+    LessThan = 6,
+    EqualTo = 7,
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Packet {
-    Op(OperatorPacket),
-    Lit(LiteralPacket),
+    Op(Version, Type, Vec<Packet>),
+    Lit(Version, u64),
 }
 
-#[allow(dead_code)]
-#[derive(Default, Debug, PartialEq)]
-pub struct OperatorPacket {
-    version: u8,
-    type_id: u8,
-    length_type_id: bool,
-    sub_packets: Vec<Packet>,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub struct LiteralPacket {
-    version: u8,
-    type_id: u8,
-    data: Vec<u8>,
-}
 
 impl Packet {
     fn from_iterator(b: &mut BitIterator) -> Result<Self, String> {
         let version = b.read(3).ok_or("Failed to read version")?;
-        let type_id = b.read(3).ok_or("Failed to read type_id")?;
-        if let 4 = type_id {
-            let mut nibbles = Vec::new();
+        let type_id = Type::try_from(b.read(3).ok_or("Failed to read type_id")?).expect("valid packet type");
+        if type_id == Type::Literal {
             let mut prefix = true;
+            let mut data = 0;
             while prefix {
                 prefix = b.next().ok_or("Failed to read prefix")?;
-                nibbles.push(b.read(4).ok_or("Failed to read prefix")?);
+                data <<= 4;
+                data |= b.read(4).ok_or("Failed to read prefix")? as u64
             }
-            if nibbles.len() % 2 == 1 {
-                nibbles.push(0);
-            }
-            let data = nibbles.chunks(2).map(|c| { (c[0] << 4) | c[1]}).collect();
-            Ok(Packet::Lit(LiteralPacket {
-                version,
-                type_id,
-                data,
-            }))
+            Ok(Packet::Lit(version, data))
         } else {
             let length_type_id: bool = b.next().ok_or("Failed to read length_type_id")?;
             let mut sub_packets: Vec<Packet> = Vec::new();
             if !length_type_id {
-                let total_bit_length = b.read2(15).ok_or("Failed to read total_bit_length")?;
-                let curr_bits_remaining = b.num_remaining;
-                while curr_bits_remaining - b.num_remaining > total_bit_length.into() {
+                let subpackets_length_bits = b.read2(15).ok_or("Failed to read subpackets_length_bits")?;
+                let start = b.num_remaining;
+                while start - b.num_remaining < (subpackets_length_bits as usize) {
                     sub_packets.push(Packet::from_iterator(b)?);
                 }
             } else {
-                let additional_sub_packets = b.read2(11).ok_or("Failed to read additional_sub_packets")?;
-                for _ in 0..additional_sub_packets {
+                let num_sub_packets = b.read2(11).ok_or("Failed to read additional_sub_packets")?;
+                for _ in 0..num_sub_packets {
                     sub_packets.push(Packet::from_iterator(b)?);
                 }
             }
-            Ok(Packet::Op(OperatorPacket {
-                version,
-                type_id,
-                length_type_id,
-                sub_packets,
-            }))
+            Ok(Packet::Op(version, type_id, sub_packets))
         }
     }
-}
 
-fn get_version_numbers(packet: &Packet) -> Vec<u8> {
-    match packet {
-        Packet::Op(op_packet) => {
-            let mut ret: Vec<u8> = op_packet
-            .sub_packets
-            .iter()
-            .map(|p| get_version_numbers(p))
-            .flatten()
-            .collect();
-            ret.push(op_packet.version);
-            ret
-        },
-        Packet::Lit(lit_packet) => vec![lit_packet.version],
+    fn get_version_numbers(&self) -> Vec<u8> {
+        match self {
+            Packet::Op(version, _type_i, sub_packets) => {
+                let mut ret: Vec<u8> = 
+                    sub_packets
+                    .iter()
+                    .map(|p| p.get_version_numbers())
+                    .flatten()
+                    .collect();
+                ret.push(*version);
+                ret
+            },
+            Packet::Lit(version, _value) => vec![*version],
+        }
+    }
+
+    fn evaluate(&self) -> u64 {
+        match self {
+            Packet::Op(_version, type_id, sub_packets) => {
+                match *type_id {
+                    Type::Sum => sub_packets.iter().map(|p| p.evaluate()).sum(),
+                    Type::Product => sub_packets.iter().map(|p| p.evaluate()).product(),
+                    Type::Minimum => sub_packets.iter().map(|p| p.evaluate()).min().expect("min"),
+                    Type::Maximum => sub_packets.iter().map(|p| p.evaluate()).max().expect("max"),
+                    Type::EqualTo => if sub_packets[0].evaluate() == sub_packets[1].evaluate() { 1 } else { 0 },
+                    Type::GreaterThan => if sub_packets[0].evaluate() > sub_packets[1].evaluate() { 1 } else { 0 },
+                    Type::LessThan => if sub_packets[0].evaluate() < sub_packets[1].evaluate() { 1 } else { 0 },
+                    Type::Literal => panic!("should not happen"),
+                }
+            },
+            Packet::Lit(_version, value) => *value,
+        }
     }
 }
 
@@ -185,10 +190,19 @@ impl Solution<'_, { Day::Day16 }, { Part::One }> for AOC2021<{ Day::Day16 }> {
     type Output = u64;
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
-        eprintln!("Packet:\n{:?}",input);
-        get_version_numbers(&input).iter().map(|v| *v as u64).sum()
+        input.get_version_numbers().iter().map(|n| *n as u64).sum()
     }
 }
+
+impl Solution<'_, { Day::Day16 }, { Part::Two }> for AOC2021<{ Day::Day16 }> {
+    type Input = Packet;
+    type Output = u64;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        input.evaluate()
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -256,7 +270,15 @@ mod tests {
     #[test]
     fn test_literal_packet() {
         let packet = Packet::from_iterator(&mut BitIterator::from_str("D2FE28").expect("bit iterator")).expect("is a packet");
-        assert_eq!(packet, Packet::Lit(LiteralPacket {version: 6, type_id: 4, data: vec![7, 229]}));
+        assert_eq!(packet, Packet::Lit(6, 2021));
+    }
+
+    #[test]
+    fn test_operator_packet() {
+        let packet = Packet::from_iterator(&mut BitIterator::from_str("38006F45291200").expect("bit iterator")).expect("is a packet");
+        let expected_sub_packets = vec![Packet::Lit(6, 10), Packet::Lit(2, 20)];
+        let expected = Packet::Op(1, Type::LessThan, expected_sub_packets);
+        assert_eq!(packet, expected);
     }
 
     #[test]
