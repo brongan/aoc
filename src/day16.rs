@@ -1,11 +1,11 @@
-use nom::IResult;
 use nom::bytes::complete::take_while_m_n;
 use nom::combinator::map_res;
 use nom::multi::many1;
+use nom::IResult;
 use num_enum::TryFromPrimitive;
 
 use super::AOC2021;
-use crate::aoc::{Day, Part, Solution, ParseInput};
+use crate::aoc::{Day, ParseInput, Part, Solution};
 use std::iter::Iterator;
 use std::str::FromStr;
 
@@ -18,18 +18,15 @@ pub struct BitIterator {
 }
 
 fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
-  u8::from_str_radix(input, 16)
+    u8::from_str_radix(input, 16)
 }
 
 fn is_hex_digit(c: char) -> bool {
-  c.is_digit(16)
+    c.is_digit(16)
 }
 
 fn hex2(input: &str) -> IResult<&str, u8> {
-    map_res(
-    take_while_m_n(2, 2, is_hex_digit),
-    from_hex
-  )(input)
+    map_res(take_while_m_n(2, 2, is_hex_digit), from_hex)(input)
 }
 
 fn hex_to_array(input: &str) -> IResult<&str, Vec<u8>> {
@@ -109,11 +106,11 @@ pub enum Packet {
     Lit(Version, u64),
 }
 
-
 impl Packet {
     fn from_iterator(b: &mut BitIterator) -> Result<Self, String> {
         let version = b.read(3).ok_or("Failed to read version")?;
-        let type_id = Type::try_from(b.read(3).ok_or("Failed to read type_id")?).expect("valid packet type");
+        let type_id =
+            Type::try_from(b.read(3).ok_or("Failed to read type_id")?).expect("valid packet type");
         if type_id == Type::Literal {
             let mut prefix = true;
             let mut data = 0;
@@ -127,7 +124,8 @@ impl Packet {
             let length_type_id: bool = b.next().ok_or("Failed to read length_type_id")?;
             let mut sub_packets: Vec<Packet> = Vec::new();
             if !length_type_id {
-                let subpackets_length_bits = b.read2(15).ok_or("Failed to read subpackets_length_bits")?;
+                let subpackets_length_bits =
+                    b.read2(15).ok_or("Failed to read subpackets_length_bits")?;
                 let start = b.num_remaining;
                 while start - b.num_remaining < (subpackets_length_bits as usize) {
                     sub_packets.push(Packet::from_iterator(b)?);
@@ -145,32 +143,47 @@ impl Packet {
     fn get_version_numbers(&self) -> Vec<u8> {
         match self {
             Packet::Op(version, _type_i, sub_packets) => {
-                let mut ret: Vec<u8> = 
-                    sub_packets
+                let mut ret: Vec<u8> = sub_packets
                     .iter()
                     .map(|p| p.get_version_numbers())
                     .flatten()
                     .collect();
                 ret.push(*version);
                 ret
-            },
+            }
             Packet::Lit(version, _value) => vec![*version],
         }
     }
 
     fn evaluate(&self) -> u64 {
         match self {
-            Packet::Op(_version, type_id, sub_packets) => {
-                match *type_id {
-                    Type::Sum => sub_packets.iter().map(|p| p.evaluate()).sum(),
-                    Type::Product => sub_packets.iter().map(|p| p.evaluate()).product(),
-                    Type::Minimum => sub_packets.iter().map(|p| p.evaluate()).min().expect("min"),
-                    Type::Maximum => sub_packets.iter().map(|p| p.evaluate()).max().expect("max"),
-                    Type::EqualTo => if sub_packets[0].evaluate() == sub_packets[1].evaluate() { 1 } else { 0 },
-                    Type::GreaterThan => if sub_packets[0].evaluate() > sub_packets[1].evaluate() { 1 } else { 0 },
-                    Type::LessThan => if sub_packets[0].evaluate() < sub_packets[1].evaluate() { 1 } else { 0 },
-                    Type::Literal => panic!("should not happen"),
+            Packet::Op(_version, type_id, sub_packets) => match *type_id {
+                Type::Sum => sub_packets.iter().map(|p| p.evaluate()).sum(),
+                Type::Product => sub_packets.iter().map(|p| p.evaluate()).product(),
+                Type::Minimum => sub_packets.iter().map(|p| p.evaluate()).min().expect("min"),
+                Type::Maximum => sub_packets.iter().map(|p| p.evaluate()).max().expect("max"),
+                Type::EqualTo => {
+                    if sub_packets[0].evaluate() == sub_packets[1].evaluate() {
+                        1
+                    } else {
+                        0
+                    }
                 }
+                Type::GreaterThan => {
+                    if sub_packets[0].evaluate() > sub_packets[1].evaluate() {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                Type::LessThan => {
+                    if sub_packets[0].evaluate() < sub_packets[1].evaluate() {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                Type::Literal => panic!("should not happen"),
             },
             Packet::Lit(_version, value) => *value,
         }
@@ -181,7 +194,8 @@ impl ParseInput<'_, { Day::Day16 }> for AOC2021<{ Day::Day16 }> {
     type Parsed = Packet;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        Packet::from_iterator(&mut BitIterator::from_str(&input).expect("failed to parse hex")).expect("failed to parse packet")
+        Packet::from_iterator(&mut BitIterator::from_str(&input).expect("failed to parse hex"))
+            .expect("failed to parse packet")
     }
 }
 
@@ -203,7 +217,6 @@ impl Solution<'_, { Day::Day16 }, { Part::Two }> for AOC2021<{ Day::Day16 }> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -211,7 +224,7 @@ mod tests {
 
     #[test]
     fn test_hex_parsing() {
-          assert_eq!(hex_to_array("2F14DF"), Ok(("", vec![47,20,223])));
+        assert_eq!(hex_to_array("2F14DF"), Ok(("", vec![47, 20, 223])));
     }
 
     #[test]
@@ -243,39 +256,56 @@ mod tests {
 
         let (rem, val) = hex_to_array("D2FE28").expect("is ok");
         assert!(rem.is_empty());
-        assert_eq!(val.iter().map(|v| format!("{:08b}", v)).collect::<String>(), "110100101111111000101000");
+        assert_eq!(
+            val.iter().map(|v| format!("{:08b}", v)).collect::<String>(),
+            "110100101111111000101000"
+        );
     }
 
     #[test]
     fn test_hex_binary1() {
         let (rem, val) = hex_to_array("D2FE28").expect("is ok");
         assert!(rem.is_empty());
-        assert_eq!(val.iter().map(|v| format!("{:08b}", v)).collect::<String>(), "110100101111111000101000");
+        assert_eq!(
+            val.iter().map(|v| format!("{:08b}", v)).collect::<String>(),
+            "110100101111111000101000"
+        );
     }
 
     #[test]
     fn test_hex_binary2() {
         let (rem, val) = hex_to_array("38006F45291200").expect("is ok");
         assert!(rem.is_empty());
-        assert_eq!(val.iter().map(|v| format!("{:08b}", v)).collect::<String>(), "00111000000000000110111101000101001010010001001000000000");
+        assert_eq!(
+            val.iter().map(|v| format!("{:08b}", v)).collect::<String>(),
+            "00111000000000000110111101000101001010010001001000000000"
+        );
     }
 
     #[test]
     fn test_hex_binary3() {
         let (rem, val) = hex_to_array("EE00D40C823060").expect("is ok");
         assert!(rem.is_empty());
-        assert_eq!(val.iter().map(|v| format!("{:08b}", v)).collect::<String>(), "11101110000000001101010000001100100000100011000001100000");
+        assert_eq!(
+            val.iter().map(|v| format!("{:08b}", v)).collect::<String>(),
+            "11101110000000001101010000001100100000100011000001100000"
+        );
     }
 
     #[test]
     fn test_literal_packet() {
-        let packet = Packet::from_iterator(&mut BitIterator::from_str("D2FE28").expect("bit iterator")).expect("is a packet");
+        let packet =
+            Packet::from_iterator(&mut BitIterator::from_str("D2FE28").expect("bit iterator"))
+                .expect("is a packet");
         assert_eq!(packet, Packet::Lit(6, 2021));
     }
 
     #[test]
     fn test_operator_packet() {
-        let packet = Packet::from_iterator(&mut BitIterator::from_str("38006F45291200").expect("bit iterator")).expect("is a packet");
+        let packet = Packet::from_iterator(
+            &mut BitIterator::from_str("38006F45291200").expect("bit iterator"),
+        )
+        .expect("is a packet");
         let expected_sub_packets = vec![Packet::Lit(6, 10), Packet::Lit(2, 20)];
         let expected = Packet::Op(1, Type::LessThan, expected_sub_packets);
         assert_eq!(packet, expected);

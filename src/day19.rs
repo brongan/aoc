@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use crate::aoc::ParseInput;
 use crate::aoc::{Day, Solution, Part};
-use super::AdventOfCode2021;
+use super::AOC2021;
 
 
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
@@ -39,7 +39,7 @@ fn parse_scanner(lines: &str) -> ScanResult {
         .collect()
 }
 
-impl ParseInput<'_, {Day::Nineteen}> for AdventOfCode2021<{Day::Nineteen}> {
+impl ParseInput<'_, {Day::Day19}> for AOC2021<{Day::Day19}> {
     type Parsed = Vec<ScanResult>;
     
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
@@ -57,9 +57,16 @@ fn match_beacons(scan_result: &Vec<Observation>, beacons: &mut Vec<Beacon>) -> O
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::aoc::PartOneVerifier;
 
     #[test]
-    fn test_pt_1() {
+    fn test_find_beacons() {
+        let (beacons, scanners) = find_positions(input);
+        assert_eq!(scanners, vec![Beacon {x: 0, y: 0, z: 0}, Beacon { x: 68, y: -1246, z: -43}, Beacon {x: 1105, y: -1205,z: 1229}, Beacon {x: -92, y: -2380,z: -20}]);
+    }
+
+    #[test]
+    fn test() -> Result<(), String> {
         let input: &str = "
             --- scanner 0 ---
             404,-588,-901
@@ -198,10 +205,8 @@ mod tests {
             -652,-548,-490
             30,-46,-14
             ";
-            let input = parse_input(input);
-            let (beacons, scanners) = find_positions(input);
-            assert_eq!(scanners, vec![Beacon {x: 0, y: 0, z: 0}, Beacon { x: 68, y: -1246, z: -43}, Beacon {x: 1105, y: -1205,z: 1229}, Beacon {x: -92, y: -2380,z: -20}]);
-            assert_eq!(part1(&beacons), 79);
+            let problem = super::AOC2021::<{ Day::Day19 }>;
+            (&&&problem).test_part1(input, 79)
     }
 }
 
@@ -218,17 +223,13 @@ fn find_positions(mut input: VecDeque<ScanResult>) -> (Vec<Beacon>, Vec<Scanner>
     (beacons, scanners)
 }
 
-fn part1(beacons: &Vec<Beacon>) -> usize {
-    beacons.len()
+impl Solution<'_, { Day::Day19 }, { Part::One }> for AOC2021<{ Day::Day19 }> {
+    type Input = ScanResult;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Self::Output {
+        let (beacons, _scanners) = find_positions(input.clone());
+        beacons.len()
+    }
 }
 
-pub fn solve(input_path: &str) {
-    println!("Running day 19");
-    let input = parse_input(
-        read_to_string(input_path)
-            .expect("failed to read input")
-            .trim(),
-    );
-    let (beacons, _scanners) = find_positions(input);
-    println!("Part 1: {}", part1(&beacons));
-}

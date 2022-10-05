@@ -3,14 +3,13 @@ name = "aoc-2021"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 colored = "2.0.0"
 counter = "0.5.2"
+enumset = "1.0"
+is_type = "0.2"
 itertools = "0.10.1"
+nom = "7.1.1"
 num_enum = "0.5"
 strum = "0.24"
 strum_macros = "0.24"
-is_type = "0.2"
-nom = "7.1.1"
