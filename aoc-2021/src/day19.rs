@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
-use crate::aoc::ParseInput;
-use crate::aoc::{Day, Solution, Part};
+use aoc_runner::ParseInput;
+use aoc_runner::{Day, Solution, Part};
 use super::AOC2021;
 
 
@@ -57,7 +57,7 @@ fn match_beacons(scan_result: &Vec<Observation>, beacons: &mut Vec<Beacon>) -> O
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
+    use aoc_runner::PartOneVerifier;
 
     #[test]
     fn test_find_beacons() {

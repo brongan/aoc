@@ -5,7 +5,7 @@ use nom::IResult;
 use num_enum::TryFromPrimitive;
 
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::iter::Iterator;
 use std::str::FromStr;
 
@@ -220,7 +220,7 @@ impl Solution<'_, { Day::Day16 }, { Part::Two }> for AOC2021<{ Day::Day16 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
+    use aoc_runner::PartOneVerifier;
 
     #[test]
     fn test_hex_parsing() {

@@ -1,5 +1,5 @@
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
 use std::collections::HashSet;
@@ -181,8 +181,8 @@ impl Solution<'_, { Day::Day15 }, { Part::Two }> for AOC2021<{ Day::Day15 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test() -> Result<(), String> {

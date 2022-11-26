@@ -1,5 +1,5 @@
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 
 use std::iter::zip;
 

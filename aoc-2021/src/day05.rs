@@ -2,8 +2,8 @@ use std::cmp::{max, Ordering};
 use std::vec;
 
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
-use crate::point2d::Point2D;
+use aoc_runner::{Day, ParseInput, Part, Solution};
+use aoc_runner::point2d::Point2D;
 
 type VentLine = (Point2D<i32>, Point2D<i32>);
 type Seafloor = Vec<Vec<i32>>;
@@ -90,8 +90,8 @@ impl Solution<'_, { Day::Day5 }, { Part::Two }> for AOC2021<{ Day::Day5 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     fn input() -> &'static str {
         "0,9 -> 5,9

@@ -1,6 +1,6 @@
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
-use crate::point2d::Point2D;
+use aoc_runner::{Day, ParseInput, Part, Solution};
+use aoc_runner::point2d::Point2D;
 use std::cmp::{max, min, Ordering};
 use std::str::FromStr;
 
@@ -135,8 +135,8 @@ impl Solution<'_, { Day::Day17 }, { Part::Two }> for AOC2021<{ Day::Day17 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test() -> Result<(), String> {

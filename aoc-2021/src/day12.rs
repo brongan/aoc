@@ -4,7 +4,7 @@ use std::{
 };
 
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 enum Node {
@@ -150,8 +150,8 @@ impl Solution<'_, { Day::Day12 }, { Part::Two }> for AOC2021<{ Day::Day12 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test() -> Result<(), String> {

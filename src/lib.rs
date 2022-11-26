@@ -1,9 +1,25 @@
+#![allow(incomplete_features)]
+#![feature(adt_const_params)]
+#![feature(specialization)]
+
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt::Display;
 use strum_macros::EnumIter;
 
+pub mod point2d;
+
 #[derive(
-    PartialEq, Eq, EnumIter, PartialOrd, Ord, TryFromPrimitive, IntoPrimitive, Debug, Clone, Copy,
+    PartialEq,
+    Eq,
+    EnumIter,
+    PartialOrd,
+    Ord,
+    TryFromPrimitive,
+    IntoPrimitive,
+    Debug,
+    Clone,
+    Copy,
+    Hash,
 )]
 #[repr(u8)]
 pub enum Day {
@@ -72,9 +88,9 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
-        let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(&self, &parsed_input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
+        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
+        let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed_input);
         println!("Part One: {}", part1_output);
         println!("Part Two: {}", part2_output);
     }
@@ -86,8 +102,8 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     default fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
+        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
 
         println!("Part One: {}", part1_output);
     }
@@ -100,8 +116,8 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
     fn test_part1(&'a self, input: &'a str, expected: U) -> Result<(), String> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
-        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(&self, &parsed_input);
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
+        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
         if output == expected {
             Ok(())
         } else {
@@ -123,8 +139,8 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
     fn test_part2(&'a self, input: &'a str, expected: U) -> Result<(), String> {
-        let input = <Self as ParseInput<DAY>>::parse_input(&self, input.trim());
-        let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(&self, &input);
+        let input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
+        let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input);
         if output == expected {
             Ok(())
         } else {
@@ -140,6 +156,7 @@ where
 }
 
 #[allow(unused_macros)]
+#[macro_export]
 macro_rules! run {
     ($day: expr, $input: expr) => {{
         let problem = $day;

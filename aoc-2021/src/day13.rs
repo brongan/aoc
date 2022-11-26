@@ -1,9 +1,9 @@
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 use itertools::Itertools;
 use std::{collections::HashSet, str::FromStr};
 
-use crate::point2d::Point2D;
+use aoc_runner::point2d::Point2D;
 
 enum FoldInstruction {
     X(usize),
@@ -147,8 +147,8 @@ impl Solution<'_, { Day::Day13 }, { Part::Two }> for AOC2021<{ Day::Day13 }> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::aoc::PartOneVerifier;
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     const EXAMPLE_INPUT: &str = "
 6,10

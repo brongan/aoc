@@ -1,5 +1,5 @@
 use super::AOC2021;
-use crate::aoc::{Day, ParseInput, Part, Solution};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 
 fn most_common_elements(lines: &[String]) -> Vec<char> {
     (0..lines[0].len())
@@ -82,7 +82,7 @@ impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2021<{ Day::Day3 }> {
 mod tests {
     use itertools::Itertools;
 
-    use crate::aoc::PartTwoVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     use super::*;
 
