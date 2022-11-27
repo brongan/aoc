@@ -121,7 +121,7 @@ mod tests {
 4846848554
 5283751526";
         let problem = super::AOC2021::<{ Day::Day11 }>;
-        (&&&problem).test_part1(input, 1656)?;
-        (&&&problem).test_part2(input, 195)
+        problem.test_part1(input, 1656)?;
+        problem.test_part2(input, 195)
     }
 }

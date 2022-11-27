@@ -183,7 +183,7 @@ fold along x=5";
     #[test]
     fn test_example() {
         let problem = super::AOC2021::<{ Day::Day13 }>;
-        let mut parsed = (&&&problem).parse_input(EXAMPLE_INPUT);
+        let mut parsed = problem.parse_input(EXAMPLE_INPUT);
         let expected_paper = "
 ...#..#..#.
 ....#......
@@ -227,7 +227,7 @@ fold along x=5";
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day13 }>;
 
-        (&&&problem).test_part1(EXAMPLE_INPUT, 17)?;
-        (&&&problem).test_part2(EXAMPLE_INPUT, format!("\n{}", EXAMPLE_PART2_RESULT.trim()))
+        problem.test_part1(EXAMPLE_INPUT, 17)?;
+        problem.test_part2(EXAMPLE_INPUT, format!("\n{}", EXAMPLE_PART2_RESULT.trim()))
     }
 }

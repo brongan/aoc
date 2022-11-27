@@ -110,7 +110,7 @@ BC -> B
 CC -> N
 CN -> C";
         let problem = super::AOC2021::<{ Day::Day14 }>;
-        (&&&problem).test_part1(input, 1588)?;
-        (&&&problem).test_part2(input, 2188189693529)
+        problem.test_part1(input, 1588)?;
+        problem.test_part2(input, 2188189693529)
     }
 }

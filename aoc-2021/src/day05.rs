@@ -2,8 +2,8 @@ use std::cmp::{max, Ordering};
 use std::vec;
 
 use super::AOC2021;
-use aoc_runner::{Day, ParseInput, Part, Solution};
 use aoc_runner::point2d::Point2D;
+use aoc_runner::{Day, ParseInput, Part, Solution};
 
 type VentLine = (Point2D<i32>, Point2D<i32>);
 type Seafloor = Vec<Vec<i32>>;
@@ -109,7 +109,7 @@ mod tests {
     #[test]
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day5 }>;
-        (&&&problem).test_part1(&input(), 5)?;
-        (&&&problem).test_part2(&input(), 12)
+        problem.test_part1(input(), 5)?;
+        problem.test_part2(input(), 12)
     }
 }

@@ -206,7 +206,7 @@ mod tests {
             30,-46,-14
             ";
             let problem = super::AOC2021::<{ Day::Day19 }>;
-            (&&&problem).test_part1(input, 79)
+            problem.test_part1(input, 79)
     }
 }
 

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use super::AOC2021;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum SyntaxScore {
     Corrupt(char),
     Incomplete(Vec<char>),
@@ -43,7 +43,7 @@ impl FromStr for SyntaxScore {
     }
 }
 
-fn score_line_completion(string: &Vec<char>) -> usize {
+fn score_line_completion(string: &[char]) -> usize {
     string
         .iter()
         .map(|c| match c {
@@ -89,8 +89,7 @@ impl Solution<'_, { Day::Day10 }, { Part::One }> for AOC2021<{ Day::Day10 }> {
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
         input
-            .clone()
-            .into_iter()
+            .iter()
             .filter(|s| s.is_corrupt())
             .map(|s| s.score())
             .sum()
@@ -103,8 +102,7 @@ impl Solution<'_, { Day::Day10 }, { Part::Two }> for AOC2021<{ Day::Day10 }> {
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
         let mut completion_scores: Vec<usize> = input
-            .clone()
-            .into_iter()
+            .iter()
             .filter(|s| s.is_incomplete())
             .map(|s| s.score())
             .collect();
@@ -132,7 +130,7 @@ mod tests {
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]";
         let problem = super::AOC2021::<{ Day::Day10 }>;
-        (&&&problem).test_part1(input, 26397)?;
-        (&&&problem).test_part2(input, 288957)
+        problem.test_part1(input, 26397)?;
+        problem.test_part2(input, 288957)
     }
 }

@@ -48,7 +48,7 @@ impl Solution<'_, { Day::Day7 }, { Part::Two }> for AOC2021<{ Day::Day7 }> {
             (*input.iter().min().expect("has min"))..(*input.iter().max().unwrap());
         possible_range
             .into_iter()
-            .map(|crab| part2_fuel_cost(&input, crab))
+            .map(|crab| part2_fuel_cost(input, crab))
             .min()
             .unwrap()
     }
@@ -63,7 +63,7 @@ mod tests {
     #[test]
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day7 }>;
-        (&&&problem).test_part1("16,1,2,0,4,2,7,1,2,14", 37)?;
-        (&&&problem).test_part2("16,1,2,0,4,2,7,1,2,14", 168)
+        problem.test_part1("16,1,2,0,4,2,7,1,2,14", 37)?;
+        problem.test_part2("16,1,2,0,4,2,7,1,2,14", 168)
     }
 }
