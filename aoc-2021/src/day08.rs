@@ -1,8 +1,8 @@
-use enumset::{EnumSetType, enum_set};
+use enumset::{enum_set, EnumSetType};
 
 use super::AOC2021;
 use aoc_runner::{Day, ParseInput, Part, Solution};
-use std::{str::FromStr, collections::HashMap};
+use std::{collections::HashMap, str::FromStr};
 
 #[allow(dead_code)]
 pub struct Entry {
@@ -45,7 +45,7 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2021<{ Day::Day8 }> {
 
     fn solve(&self, input: &Self::Input) -> Self::Output {
         input
-            .into_iter()
+            .iter()
             .map(|entry| {
                 entry
                     .output
@@ -94,19 +94,98 @@ impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2021<{ Day::Day8 }> {
         // Map from letter to Segment(s)
         // Map from Segments to Digit
         let mut segment_to_digit = HashMap::new();
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::Top | Segment::TopRight | Segment::BottomLeft | Segment::BottomRight | Segment::Bottom), Digit::Digit0);
-        segment_to_digit.insert(enum_set!(Segment::TopRight | Segment::BottomRight), Digit::Digit1);
-        segment_to_digit.insert(enum_set!(Segment::Top| Segment::TopRight | Segment::Middle | Segment::BottomLeft | Segment::Bottom), Digit::Digit2);
-        segment_to_digit.insert(enum_set!(Segment::Top | Segment::TopRight | Segment::Middle | Segment::BottomRight | Segment::Bottom), Digit::Digit3);
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::TopRight | Segment::Middle | Segment::BottomRight), Digit::Digit4);
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::Top | Segment::Middle | Segment::BottomRight | Segment::Bottom), Digit::Digit5);
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::Top | Segment::Middle | Segment::BottomLeft | Segment::BottomRight | Segment::Bottom), Digit::Digit6);
-        segment_to_digit.insert(enum_set!(Segment::Top | Segment::TopRight | Segment::BottomRight), Digit::Digit7);
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::Top | Segment::TopRight | Segment::Middle | Segment::BottomLeft | Segment::BottomRight | Segment::Bottom), Digit::Digit8);
-        segment_to_digit.insert(enum_set!(Segment::TopLeft | Segment::Top | Segment::TopRight | Segment::Middle |  Segment::BottomRight | Segment::Bottom), Digit::Digit9);
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft
+                    | Segment::Top
+                    | Segment::TopRight
+                    | Segment::BottomLeft
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit0,
+        );
+        segment_to_digit.insert(
+            enum_set!(Segment::TopRight | Segment::BottomRight),
+            Digit::Digit1,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::Top
+                    | Segment::TopRight
+                    | Segment::Middle
+                    | Segment::BottomLeft
+                    | Segment::Bottom
+            ),
+            Digit::Digit2,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::Top
+                    | Segment::TopRight
+                    | Segment::Middle
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit3,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft | Segment::TopRight | Segment::Middle | Segment::BottomRight
+            ),
+            Digit::Digit4,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft
+                    | Segment::Top
+                    | Segment::Middle
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit5,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft
+                    | Segment::Top
+                    | Segment::Middle
+                    | Segment::BottomLeft
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit6,
+        );
+        segment_to_digit.insert(
+            enum_set!(Segment::Top | Segment::TopRight | Segment::BottomRight),
+            Digit::Digit7,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft
+                    | Segment::Top
+                    | Segment::TopRight
+                    | Segment::Middle
+                    | Segment::BottomLeft
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit8,
+        );
+        segment_to_digit.insert(
+            enum_set!(
+                Segment::TopLeft
+                    | Segment::Top
+                    | Segment::TopRight
+                    | Segment::Middle
+                    | Segment::BottomRight
+                    | Segment::Bottom
+            ),
+            Digit::Digit9,
+        );
 
         input
-            .into_iter()
+            .iter()
             .map(|entry| {
                 entry
                     .output
@@ -140,7 +219,7 @@ bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd |ed bcgafe cdgba cbge
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg |gbdfcae bgc cg cgb
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc |fgae cfgab fg bagce";
         let problem = super::AOC2021::<{ Day::Day8 }>;
-        (&&&problem).test_part1(input, 26)?;
-        (&&&problem).test_part2(input, 61229)
+        problem.test_part1(input, 26)?;
+        problem.test_part2(input, 61229)
     }
 }

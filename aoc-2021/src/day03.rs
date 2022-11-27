@@ -55,20 +55,14 @@ impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2021<{ Day::Day3 }> {
         let mut col: usize = 0;
         while oxygen_gen_lines.len() > 1 {
             let commonz = most_common_elements(&oxygen_gen_lines);
-            oxygen_gen_lines = oxygen_gen_lines
-                .into_iter()
-                .filter(|line| line.as_bytes()[col] == commonz[col] as u8)
-                .collect();
+            oxygen_gen_lines.retain(|line| line.as_bytes()[col] == commonz[col] as u8);
             col += 1;
         }
         let mut co2_gen_lines = input.clone();
         let mut col = 0;
         while co2_gen_lines.len() > 1 {
             let commonz = most_common_elements(&co2_gen_lines);
-            co2_gen_lines = co2_gen_lines
-                .into_iter()
-                .filter(|line| line.as_bytes()[col] != commonz[col] as u8)
-                .collect();
+            co2_gen_lines.retain(|line| line.as_bytes()[col] != commonz[col] as u8);
             col += 1;
         }
 
@@ -105,6 +99,6 @@ mod tests {
             .into_iter()
             .join("\n");
         let problem = super::AOC2021::<{ Day::Day3 }>;
-        (&&&problem).test_part2(&input, 230)
+        problem.test_part2(&input, 230)
     }
 }

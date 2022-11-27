@@ -1,8 +1,8 @@
 use std::collections::{HashSet, VecDeque};
 
 use super::AOC2021;
-use aoc_runner::{Day, ParseInput, Part, Solution};
 use aoc_runner::point2d::Point2D;
+use aoc_runner::{Day, ParseInput, Part, Solution};
 
 impl ParseInput<'_, { Day::Day9 }> for AOC2021<{ Day::Day9 }> {
     type Parsed = Vec<Vec<u32>>;
@@ -120,7 +120,7 @@ mod tests {
 8767896789
 9899965678";
         let problem = super::AOC2021::<{ Day::Day9 }>;
-        (&&&problem).test_part1(input, 15)?;
-        (&&&problem).test_part2(input, 1134)
+        problem.test_part1(input, 15)?;
+        problem.test_part2(input, 1134)
     }
 }

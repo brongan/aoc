@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day6 }>;
-        (&&&problem).test_part1("3,4,3,1,2", 5934)?;
-        (&&&problem).test_part2("3,4,3,1,2", 26984457539)
+        problem.test_part1("3,4,3,1,2", 5934)?;
+        problem.test_part2("3,4,3,1,2", 26984457539)
     }
 }

@@ -247,12 +247,12 @@ mod tests {
 56475739656758684176786979528789718163989182927419
 67554889357866599146897761125791887223681299833479";
         let problem = super::AOC2021::<{ Day::Day15 }>;
-        let parsed_input = (&&&problem).parse_input(input);
-        (&&&problem).test_part1(input, 40)?;
+        let parsed_input = problem.parse_input(input);
+        problem.test_part1(input, 40)?;
 
-        let expected_extended_input = (&&&problem).parse_input(expected_extended_input);
+        let expected_extended_input = problem.parse_input(expected_extended_input);
         let extended_input = part2_extend(parsed_input);
         assert_eq!(extended_input, expected_extended_input);
-        (&&&problem).test_part2(input, 315)
+        problem.test_part2(input, 315)
     }
 }

@@ -22,7 +22,7 @@ fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
 }
 
 fn is_hex_digit(c: char) -> bool {
-    c.is_digit(16)
+    c.is_ascii_hexdigit()
 }
 
 fn hex2(input: &str) -> IResult<&str, u8> {
@@ -87,7 +87,7 @@ impl BitIterator {
 
 type Version = u8;
 
-#[derive(Debug, PartialEq, TryFromPrimitive)]
+#[derive(Debug, PartialEq, Eq, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Type {
     Sum = 0,
@@ -145,8 +145,7 @@ impl Packet {
             Packet::Op(version, _type_i, sub_packets) => {
                 let mut ret: Vec<u8> = sub_packets
                     .iter()
-                    .map(|p| p.get_version_numbers())
-                    .flatten()
+                    .flat_map(|p| p.get_version_numbers())
                     .collect();
                 ret.push(*version);
                 ret
@@ -194,7 +193,7 @@ impl ParseInput<'_, { Day::Day16 }> for AOC2021<{ Day::Day16 }> {
     type Parsed = Packet;
 
     fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        Packet::from_iterator(&mut BitIterator::from_str(&input).expect("failed to parse hex"))
+        Packet::from_iterator(&mut BitIterator::from_str(input).expect("failed to parse hex"))
             .expect("failed to parse packet")
     }
 }
@@ -315,12 +314,12 @@ mod tests {
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day16 }>;
         let input = "620080001611562C8802118E34";
-        (&&&problem).test_part1(input, 12)?;
+        problem.test_part1(input, 12)?;
         let input = "8A004A801A8002F478";
-        (&&&problem).test_part1(input, 16)?;
+        problem.test_part1(input, 16)?;
         let input = "C0015000016115A2E0802F182340";
-        (&&&problem).test_part1(input, 23)?;
+        problem.test_part1(input, 23)?;
         let input = "A0016C880162017C3686B18A3D4780";
-        (&&&problem).test_part1(input, 31)
+        problem.test_part1(input, 31)
     }
 }

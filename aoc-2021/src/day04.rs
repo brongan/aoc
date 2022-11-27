@@ -117,9 +117,9 @@ impl Solution<'_, { Day::Day4 }, { Part::One }> for AOC2021<{ Day::Day4 }> {
     fn solve(&self, input: &Self::Input) -> Self::Output {
         let mut boards = input.boards.clone();
         for num in &input.input {
-            for mut board in &mut boards {
-                if pull(&mut board, *num) && is_complete(&board) {
-                    return score(&board, *num);
+            for board in &mut boards {
+                if pull(board, *num) && is_complete(board) {
+                    return score(board, *num);
                 }
             }
         }
@@ -160,7 +160,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     fn input() -> String {
-        return "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+        "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
 22 13 17 11  0
  8  2 23  4 24
@@ -179,7 +179,7 @@ mod tests {
 18  8 23 26 20
 22 11 13  6  5
  2  0 12  3  7"
-            .to_owned();
+            .to_owned()
     }
 
     #[test]
@@ -218,7 +218,7 @@ mod tests {
     #[test]
     fn test() -> Result<(), String> {
         let problem = super::AOC2021::<{ Day::Day4 }>;
-        (&&&problem).test_part1(&input(), 4512)?;
-        (&&&problem).test_part2(&input(), 1924)
+        problem.test_part1(&input(), 4512)?;
+        problem.test_part2(&input(), 1924)
     }
 }
