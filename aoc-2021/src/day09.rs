@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Context};
 use std::collections::{HashSet, VecDeque};
 
 use super::AOC2021;
@@ -9,14 +9,14 @@ impl ParseInput<'_, { Day::Day9 }> for AOC2021<{ Day::Day9 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .lines()
             .map(|line| {
                 line.chars()
-                    .map(|digit| digit.to_digit(10).expect("Expected Digit"))
+                    .map(|digit| digit.to_digit(10).context("Expected Digit"))
                     .collect()
             })
-            .collect())
+        .collect()
     }
 }
 

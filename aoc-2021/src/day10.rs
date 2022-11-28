@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Context};
 use std::str::FromStr;
 
 use super::AOC2021;
@@ -14,11 +14,11 @@ impl ParseInput<'_, { Day::Day10 }> for AOC2021<{ Day::Day10 }> {
     type Parsed = Vec<SyntaxScore>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .split('\n')
             .map(SyntaxScore::from_str)
-            .map(|x| x.expect("Failed to parse line"))
-            .collect())
+            .map(|x| x.context("Failed to parse line"))
+            .collect()
     }
 }
 

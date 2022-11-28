@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::anyhow;
+use anyhow::Context;
 use anyhow::Result;
 use aoc_runner::point2d::Point2D;
 use aoc_runner::{Day, ParseInput, Part, Solution};
@@ -51,7 +51,7 @@ impl ParseInput<'_, { Day::Day17 }> for AOC2021<{ Day::Day17 }> {
     type Parsed = TargetArea;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(TargetArea::from_str(input).expect("failed to parse target area"))
+        Ok(TargetArea::from_str(input).context("failed to parse target area")?)
     }
 }
 
@@ -113,7 +113,7 @@ impl Solution<'_, { Day::Day17 }, { Part::One }> for AOC2021<{ Day::Day17 }> {
                     .filter_map(move |dy: i32| trajectory_height(p, Velocity { dx, dy }, input))
             })
             .max()
-            .ok_or_else(|| anyhow!("failed to find max"))?)
+            .context("failed to find max")?)
     }
 }
 

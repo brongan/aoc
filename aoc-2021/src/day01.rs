@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Context;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 use anyhow::Result;
@@ -8,11 +9,11 @@ impl ParseInput<'_, { Day::Day1 }> for AOC2021<{ Day::Day1 }> {
     type Parsed = Vec<u32>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .lines()
             .into_iter()
-            .map(|s| s.parse::<u32>().expect("Failed to parse input"))
-            .collect())
+            .map(|s| s.parse::<u32>().context("Failed to parse input"))
+            .collect()
     }
 }
 

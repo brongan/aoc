@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::Result;
+use anyhow::{Result, Context};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
@@ -14,15 +14,15 @@ impl ParseInput<'_, { Day::Day15 }> for AOC2021<{ Day::Day15 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .lines()
             .map(|line| {
                 line.trim()
                     .chars()
-                    .map(|c| c.to_digit(10).expect("invalid digit"))
+                    .map(|c| c.to_digit(10).context("invalid digit"))
                     .collect()
             })
-            .collect())
+        .collect::<Result<Vec<Vec<u32>>>>()
     }
 }
 
@@ -134,7 +134,7 @@ impl Solution<'_, { Day::Day15 }, { Part::One }> for AOC2021<{ Day::Day15 }> {
     type Output = u32;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let (_prev, path_cost) = djikstra(input).expect("Did not find solution");
+        let (_prev, path_cost) = djikstra(input).context("Did not find solution")?;
         //print_map(input, &prev);
         Ok(path_cost)
     }
@@ -173,7 +173,7 @@ impl Solution<'_, { Day::Day15 }, { Part::Two }> for AOC2021<{ Day::Day15 }> {
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let input = part2_extend(input.to_vec());
-        let (_prev, path_cost) = djikstra(&input).expect("Did not find solution");
+        let (_prev, path_cost) = djikstra(&input).context("Did not find solution")?;
         //print_map(&input, &prev);
         Ok(path_cost)
     }

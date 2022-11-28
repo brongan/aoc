@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::Result;
+use anyhow::{Result, Context};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::collections::{BTreeSet, HashSet};
 
@@ -7,14 +7,14 @@ impl ParseInput<'_, { Day::Day11 }> for AOC2021<{ Day::Day11 }> {
     type Parsed = Vec<Vec<u32>>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .split('\n')
             .map(|l| {
                 l.chars()
-                    .map(|c| c.to_digit(10).expect("failed to parse digit"))
+                    .map(|c| c.to_digit(10).context("failed to parse digit"))
                     .collect()
             })
-            .collect())
+        .collect()
     }
 }
 

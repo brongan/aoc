@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::Result;
+use anyhow::{Result, Context};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::collections::HashMap;
 
@@ -16,24 +16,24 @@ impl ParseInput<'_, { Day::Day14 }> for AOC2021<{ Day::Day14 }> {
     type Parsed = Input;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        let input = input.trim().split_once("\n\n").expect("invalid input");
+        let input = input.trim().split_once("\n\n").context("invalid input")?;
         let template = input.0.trim().chars().collect();
         let rules: HashMap<(char, char), char> = input
             .1
             .trim()
             .split('\n')
             .map(|line| {
-                let terms = line.split_once(" -> ").expect("invalid line");
+                let terms = line.split_once(" -> ").context("invalid line")?;
                 let mut pair_input = terms.0.chars();
-                (
+                Ok((
                     (
-                        pair_input.next().expect("invalid rule"),
-                        pair_input.next().expect("invalid rule"),
+                        pair_input.next().context("invalid rule")?,
+                        pair_input.next().context("invalid rule")?,
                     ),
-                    terms.1.chars().next().expect("invalid rule"),
-                )
+                    terms.1.chars().next().context("invalid rule")?,
+                ))
             })
-            .collect();
+            .collect::<Result<HashMap<(char,char), char>>>()?;
         Ok(Input { template, rules })
     }
 }
@@ -42,7 +42,7 @@ fn run_polymerization(
     template: &[char],
     rules: &HashMap<(char, char), char>,
     steps: usize,
-) -> usize {
+) -> Result<usize> {
     let mut pair_counts: Counter<Pair> =
         Counter::init(template.windows(2).map(|window| (window[0], window[1])));
     for _ in 0..steps {
@@ -63,7 +63,7 @@ fn run_polymerization(
     for (_c, count) in char_counts.iter_mut() {
         *count /= 2;
     }
-    return char_counts.values().max().unwrap() - char_counts.values().min().unwrap() + 1;
+    Ok(char_counts.values().max().context("need at least one char_count")? - char_counts.values().min().unwrap() + 1)
 }
 
 impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2021<{ Day::Day14 }> {
@@ -71,7 +71,7 @@ impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2021<{ Day::Day14 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(run_polymerization(&input.template, &input.rules, 10))
+        run_polymerization(&input.template, &input.rules, 10)
     }
 }
 
@@ -80,7 +80,7 @@ impl Solution<'_, { Day::Day14 }, { Part::Two }> for AOC2021<{ Day::Day14 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(run_polymerization(&input.template, &input.rules, 40))
+        Ok(run_polymerization(&input.template, &input.rules, 40)?)
     }
 }
 
