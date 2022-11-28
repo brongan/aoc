@@ -1,4 +1,6 @@
 use super::AOC2021;
+use anyhow::anyhow;
+use anyhow::Result;
 use aoc_runner::point2d::Point2D;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::cmp::{max, min, Ordering};
@@ -17,9 +19,9 @@ pub struct TargetArea {
 }
 
 impl FromStr for TargetArea {
-    type Err = std::string::ParseError;
+    type Err = anyhow::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         let mut ranges = s
             .trim_start_matches("target area: x=")
             .split(", y=")
@@ -48,8 +50,8 @@ impl FromStr for TargetArea {
 impl ParseInput<'_, { Day::Day17 }> for AOC2021<{ Day::Day17 }> {
     type Parsed = TargetArea;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        TargetArea::from_str(input).expect("failed to parse target area")
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(TargetArea::from_str(input).expect("failed to parse target area"))
     }
 }
 
@@ -103,15 +105,15 @@ impl Solution<'_, { Day::Day17 }, { Part::One }> for AOC2021<{ Day::Day17 }> {
     type Input = TargetArea;
     type Output = i32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let p = Point2D { x: 0, y: 0 };
-        (0..100)
+        Ok((0..100)
             .flat_map(|dx: i32| {
                 (0..1000)
                     .filter_map(move |dy: i32| trajectory_height(p, Velocity { dx, dy }, input))
             })
             .max()
-            .unwrap()
+            .ok_or_else(|| anyhow!("failed to find max"))?)
     }
 }
 
@@ -119,14 +121,14 @@ impl Solution<'_, { Day::Day17 }, { Part::Two }> for AOC2021<{ Day::Day17 }> {
     type Input = TargetArea;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let p = Point2D { x: 0, y: 0 };
-        (0..input.top_right.x + 1)
+        Ok((0..input.top_right.x + 1)
             .flat_map(|dx: i32| {
                 (input.bottom_left.y..400)
                     .filter_map(move |dy: i32| trajectory_height(p, Velocity { dx, dy }, input))
             })
-            .count()
+            .count())
     }
 }
 
@@ -137,7 +139,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "target area: x=20..30, y=-10..-5";
         let problem = super::AOC2021::<{ Day::Day17 }>;
         problem.test_part1(input, 45)?;

@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 pub struct Entry {
@@ -9,8 +10,8 @@ pub struct Entry {
 impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
     type Parsed = Vec<Entry>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .lines()
             .into_iter()
             .map(|s| {
@@ -27,7 +28,7 @@ impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
                         .expect("Failed to parse input"),
                 }
             })
-            .collect()
+            .collect())
     }
 }
 
@@ -35,7 +36,7 @@ impl Solution<'_, { Day::Day2 }, { Part::One }> for AOC2021<{ Day::Day2 }> {
     type Input = Vec<Entry>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut position = 0;
         let mut depth = 0;
         for entry in input {
@@ -53,7 +54,7 @@ impl Solution<'_, { Day::Day2 }, { Part::One }> for AOC2021<{ Day::Day2 }> {
             depth,
             position * depth
         );
-        position * depth
+        Ok(position * depth)
     }
 }
 
@@ -61,7 +62,7 @@ impl Solution<'_, { Day::Day2 }, { Part::Two }> for AOC2021<{ Day::Day2 }> {
     type Input = Vec<Entry>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut position = 0;
         let mut depth = 0;
         let mut aim = 0;
@@ -84,6 +85,6 @@ impl Solution<'_, { Day::Day2 }, { Part::Two }> for AOC2021<{ Day::Day2 }> {
             aim,
             position * depth
         );
-        position * depth
+        Ok(position * depth)
     }
 }

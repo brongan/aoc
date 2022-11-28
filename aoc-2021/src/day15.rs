@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
@@ -12,8 +13,8 @@ type Point = (usize, usize);
 impl ParseInput<'_, { Day::Day15 }> for AOC2021<{ Day::Day15 }> {
     type Parsed = Vec<Vec<u32>>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .lines()
             .map(|line| {
                 line.trim()
@@ -21,7 +22,7 @@ impl ParseInput<'_, { Day::Day15 }> for AOC2021<{ Day::Day15 }> {
                     .map(|c| c.to_digit(10).expect("invalid digit"))
                     .collect()
             })
-            .collect()
+            .collect())
     }
 }
 
@@ -132,10 +133,10 @@ impl Solution<'_, { Day::Day15 }, { Part::One }> for AOC2021<{ Day::Day15 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let (_prev, path_cost) = djikstra(input).expect("Did not find solution");
         //print_map(input, &prev);
-        path_cost
+        Ok(path_cost)
     }
 }
 
@@ -170,11 +171,11 @@ impl Solution<'_, { Day::Day15 }, { Part::Two }> for AOC2021<{ Day::Day15 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let input = part2_extend(input.to_vec());
         let (_prev, path_cost) = djikstra(&input).expect("Did not find solution");
         //print_map(&input, &prev);
-        path_cost
+        Ok(path_cost)
     }
 }
 
@@ -185,7 +186,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "1163751742
 1381373672
 2136511328
@@ -247,10 +248,10 @@ mod tests {
 56475739656758684176786979528789718163989182927419
 67554889357866599146897761125791887223681299833479";
         let problem = super::AOC2021::<{ Day::Day15 }>;
-        let parsed_input = problem.parse_input(input);
+        let parsed_input = problem.parse_input(input)?;
         problem.test_part1(input, 40)?;
 
-        let expected_extended_input = problem.parse_input(expected_extended_input);
+        let expected_extended_input = problem.parse_input(expected_extended_input)?;
         let extended_input = part2_extend(parsed_input);
         assert_eq!(extended_input, expected_extended_input);
         problem.test_part2(input, 315)

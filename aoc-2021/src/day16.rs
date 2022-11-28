@@ -1,3 +1,4 @@
+use anyhow::Result;
 use nom::bytes::complete::take_while_m_n;
 use nom::combinator::map_res;
 use nom::multi::many1;
@@ -34,9 +35,10 @@ fn hex_to_array(input: &str) -> IResult<&str, Vec<u8>> {
 }
 
 impl FromStr for BitIterator {
-    type Err = std::string::ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_remainder, buf) = hex_to_array(s).expect("failed to parse hex");
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self> {
+        let s = s.to_string();
+        let (_remainder, buf) = hex_to_array(&s).unwrap();
         let len = buf.len();
         Ok(BitIterator {
             buf,
@@ -192,9 +194,11 @@ impl Packet {
 impl ParseInput<'_, { Day::Day16 }> for AOC2021<{ Day::Day16 }> {
     type Parsed = Packet;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        Packet::from_iterator(&mut BitIterator::from_str(input).expect("failed to parse hex"))
-            .expect("failed to parse packet")
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(
+            Packet::from_iterator(&mut BitIterator::from_str(input).expect("failed to parse hex"))
+                .expect("failed to parse packet"),
+        )
     }
 }
 
@@ -202,8 +206,8 @@ impl Solution<'_, { Day::Day16 }, { Part::One }> for AOC2021<{ Day::Day16 }> {
     type Input = Packet;
     type Output = u64;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input.get_version_numbers().iter().map(|n| *n as u64).sum()
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input.get_version_numbers().iter().map(|n| *n as u64).sum())
     }
 }
 
@@ -211,8 +215,8 @@ impl Solution<'_, { Day::Day16 }, { Part::Two }> for AOC2021<{ Day::Day16 }> {
     type Input = Packet;
     type Output = u64;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input.evaluate()
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input.evaluate())
     }
 }
 
@@ -311,7 +315,7 @@ mod tests {
     }
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day16 }>;
         let input = "620080001611562C8802118E34";
         problem.test_part1(input, 12)?;

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::collections::{HashSet, VecDeque};
 
 use super::AOC2021;
@@ -7,15 +8,15 @@ use aoc_runner::{Day, ParseInput, Part, Solution};
 impl ParseInput<'_, { Day::Day9 }> for AOC2021<{ Day::Day9 }> {
     type Parsed = Vec<Vec<u32>>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .lines()
             .map(|line| {
                 line.chars()
                     .map(|digit| digit.to_digit(10).expect("Expected Digit"))
                     .collect()
             })
-            .collect()
+            .collect())
     }
 }
 
@@ -58,8 +59,7 @@ fn calculate_basin_size(height_map: &[Vec<u32>], low_point: Point2D<usize>) -> u
     let mut frontier: VecDeque<Point2D<usize>> = VecDeque::from([low_point]);
     let mut visited: HashSet<Point2D<usize>> = HashSet::from([low_point]);
     let mut ret = 0;
-    while !frontier.is_empty() {
-        let node = frontier.pop_front().unwrap();
+    while let Some(node) = frontier.pop_front() {
         ret += 1;
         for neighbor in get_neighbors(
             node.x as i32,
@@ -83,11 +83,11 @@ impl Solution<'_, { Day::Day9 }, { Part::One }> for AOC2021<{ Day::Day9 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        get_low_points(input)
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(get_low_points(input)
             .iter()
             .map(|point| input[point.x][point.y] + 1)
-            .sum()
+            .sum())
     }
 }
 
@@ -95,14 +95,14 @@ impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2021<{ Day::Day9 }> {
     type Input = Vec<Vec<u32>>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut basin_sizes: Vec<u32> = get_low_points(input)
             .iter()
             .filter(|point| input[point.x][point.y] != 9)
             .map(|low_point| calculate_basin_size(input, *low_point))
             .collect();
         basin_sizes.sort_unstable();
-        basin_sizes.iter().rev().take(3).product()
+        Ok(basin_sizes.iter().rev().take(3).product())
     }
 }
 
@@ -113,7 +113,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "2199943210
 3987894921
 9856789892

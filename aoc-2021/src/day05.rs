@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::cmp::{max, Ordering};
 use std::vec;
 
@@ -54,8 +55,8 @@ fn seafloor_from_lines(
 impl ParseInput<'_, { Day::Day5 }> for AOC2021<{ Day::Day5 }> {
     type Parsed = Vec<VentLine>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input.lines().flat_map(to_vent_line).collect()
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input.lines().flat_map(to_vent_line).collect())
     }
 }
 
@@ -67,9 +68,9 @@ impl Solution<'_, { Day::Day5 }, { Part::One }> for AOC2021<{ Day::Day5 }> {
     type Input = Vec<VentLine>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let seafloor = seafloor_from_lines(input, part1_filter, 1000);
-        seafloor.iter().flatten().filter(|x| **x >= 2).count()
+        Ok(seafloor.iter().flatten().filter(|x| **x >= 2).count())
     }
 }
 
@@ -77,13 +78,13 @@ impl Solution<'_, { Day::Day5 }, { Part::Two }> for AOC2021<{ Day::Day5 }> {
     type Input = Vec<VentLine>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         fn part2_filter(line: VentLine) -> bool {
             part1_filter(line)
                 || (i32::abs_diff(line.0.x, line.1.x) == i32::abs_diff(line.0.y, line.1.y))
         }
         let seafloor = seafloor_from_lines(input, part2_filter, 1000);
-        seafloor.iter().flatten().filter(|x| **x >= 2).count()
+        Ok(seafloor.iter().flatten().filter(|x| **x >= 2).count())
     }
 }
 
@@ -107,7 +108,7 @@ mod tests {
     }
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day5 }>;
         problem.test_part1(input(), 5)?;
         problem.test_part2(input(), 12)

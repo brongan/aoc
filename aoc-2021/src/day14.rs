@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::collections::HashMap;
 
@@ -14,7 +15,7 @@ pub struct Input {
 impl ParseInput<'_, { Day::Day14 }> for AOC2021<{ Day::Day14 }> {
     type Parsed = Input;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         let input = input.trim().split_once("\n\n").expect("invalid input");
         let template = input.0.trim().chars().collect();
         let rules: HashMap<(char, char), char> = input
@@ -33,7 +34,7 @@ impl ParseInput<'_, { Day::Day14 }> for AOC2021<{ Day::Day14 }> {
                 )
             })
             .collect();
-        Input { template, rules }
+        Ok(Input { template, rules })
     }
 }
 
@@ -69,8 +70,8 @@ impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2021<{ Day::Day14 }> {
     type Input = Input;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        run_polymerization(&input.template, &input.rules, 10)
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(run_polymerization(&input.template, &input.rules, 10))
     }
 }
 
@@ -78,8 +79,8 @@ impl Solution<'_, { Day::Day14 }, { Part::Two }> for AOC2021<{ Day::Day14 }> {
     type Input = Input;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        run_polymerization(&input.template, &input.rules, 40)
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(run_polymerization(&input.template, &input.rules, 40))
     }
 }
 
@@ -90,7 +91,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "NNCB
 
 CH -> B
