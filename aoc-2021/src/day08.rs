@@ -1,4 +1,4 @@
-use anyhow::anyhow;
+use anyhow::Context;
 use anyhow::Result;
 use enumset::{enum_set, EnumSetType};
 
@@ -16,12 +16,12 @@ impl ParseInput<'_, { Day::Day8 }> for AOC2021<{ Day::Day8 }> {
     type Parsed = Vec<Entry>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .trim()
             .lines()
             .map(Entry::from_str)
-            .map(|r| r.expect("failed to parse entry"))
-            .collect())
+            .map(|r| r.context("failed to parse entry"))
+            .collect()
     }
 }
 
@@ -30,7 +30,7 @@ impl FromStr for Entry {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (signal, output) = s
             .split_once('|')
-            .ok_or_else(|| anyhow!("Failed to split line"))?;
+            .context("failed to split line")?;
         let signal = signal
             .split(' ')
             .map(|word| word.chars().collect())

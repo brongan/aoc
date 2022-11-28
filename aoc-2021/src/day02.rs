@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Context;
 use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
@@ -11,24 +12,24 @@ impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
     type Parsed = Vec<Entry>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .lines()
             .into_iter()
             .map(|s| {
                 let mut words = s.split_whitespace().take(2);
-                Entry {
+                Ok(Entry {
                     dir: words
                         .next()
-                        .expect("missing first word on line")
+                        .context("Missing first word on line")?
                         .to_string(),
-                    dist: words
-                        .next()
-                        .expect("missing second word")
-                        .parse::<u32>()
-                        .expect("Failed to parse input"),
-                }
+                        dist: words
+                            .next()
+                        .context("Missing second word on line")?
+                            .parse::<u32>()
+                            .context("Failed to parse input")?,
+                })
             })
-            .collect())
+        .collect()
     }
 }
 

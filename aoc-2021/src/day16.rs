@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Context};
 use nom::bytes::complete::take_while_m_n;
 use nom::combinator::map_res;
 use nom::multi::many1;
@@ -109,31 +109,31 @@ pub enum Packet {
 }
 
 impl Packet {
-    fn from_iterator(b: &mut BitIterator) -> Result<Self, String> {
-        let version = b.read(3).ok_or("Failed to read version")?;
+    fn from_iterator(b: &mut BitIterator) -> Result<Self> {
+        let version = b.read(3).context("Failed to read version")?;
         let type_id =
-            Type::try_from(b.read(3).ok_or("Failed to read type_id")?).expect("valid packet type");
+            Type::try_from(b.read(3).context("Failed to read type_id")?).context("Invalid type_id")?;
         if type_id == Type::Literal {
             let mut prefix = true;
             let mut data = 0;
             while prefix {
-                prefix = b.next().ok_or("Failed to read prefix")?;
+                prefix = b.next().context("Failed to read prefix")?;
                 data <<= 4;
-                data |= b.read(4).ok_or("Failed to read prefix")? as u64
+                data |= b.read(4).context("Failed to read prefix")? as u64
             }
             Ok(Packet::Lit(version, data))
         } else {
-            let length_type_id: bool = b.next().ok_or("Failed to read length_type_id")?;
+            let length_type_id: bool = b.next().context("Failed to read length_type_id")?;
             let mut sub_packets: Vec<Packet> = Vec::new();
             if !length_type_id {
                 let subpackets_length_bits =
-                    b.read2(15).ok_or("Failed to read subpackets_length_bits")?;
+                    b.read2(15).context("Failed to read subpackets_length_bits")?;
                 let start = b.num_remaining;
                 while start - b.num_remaining < (subpackets_length_bits as usize) {
                     sub_packets.push(Packet::from_iterator(b)?);
                 }
             } else {
-                let num_sub_packets = b.read2(11).ok_or("Failed to read additional_sub_packets")?;
+                let num_sub_packets = b.read2(11).context("Failed to read additional_sub_packets")?;
                 for _ in 0..num_sub_packets {
                     sub_packets.push(Packet::from_iterator(b)?);
                 }

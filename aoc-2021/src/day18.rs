@@ -169,7 +169,7 @@ impl ParseInput<'_, { Day::Day18 }> for AOC2021<{ Day::Day18 }> {
     type Parsed = Vec<Rc<RefCell<SnailFishNumber>>>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        input.lines().map(|l| snail_number(l).expect("failed to parse line")).map(|(_, v)| Rc::new(RefCell::new(v))).collect()
+        input.lines().map(|l| snail_number(l).context("failed to parse line")?).map(|(_, v)| Rc::new(RefCell::new(v))).collect()
     }
 }
 

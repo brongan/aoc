@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Context;
 use anyhow::anyhow;
 use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
@@ -8,11 +9,11 @@ impl ParseInput<'_, { Day::Day7 }> for AOC2021<{ Day::Day7 }> {
     type Parsed = Vec<usize>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(input
+        input
             .trim()
             .split(',')
-            .map(|num| num.parse::<usize>().expect("Failed to parse number"))
-            .collect())
+            .map(|num| num.parse::<usize>().context("Failed to parse number"))
+            .collect()
     }
 }
 
@@ -49,11 +50,11 @@ impl Solution<'_, { Day::Day7 }, { Part::Two }> for AOC2021<{ Day::Day7 }> {
         let possible_range: Range<usize> =
             (*input.iter().min().ok_or_else(|| anyhow!("Has a min"))?)
                 ..(*input.iter().max().ok_or_else(|| anyhow!("Has a max"))?);
-        Ok(possible_range
+        possible_range
             .into_iter()
             .map(|crab| part2_fuel_cost(input, crab))
             .min()
-            .ok_or_else(|| anyhow!("Has a min"))?)
+            .context("Failed to find min")
     }
 }
 

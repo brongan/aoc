@@ -4,7 +4,7 @@ use std::{
 };
 
 use super::AOC2021;
-use anyhow::anyhow;
+use anyhow::Context;
 use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
@@ -111,7 +111,7 @@ impl FromStr for CaveGraph {
                         Node::from_str(e.1).expect("Failed to parse node"),
                     )
                 })
-                .ok_or_else(|| anyhow!("failed to parse line"))?;
+                .context("Failed to parse line")?;
             edgelists
                 .entry(nodes.0.clone())
                 .or_insert(Vec::new())
@@ -127,7 +127,7 @@ impl ParseInput<'_, { Day::Day12 }> for AOC2021<{ Day::Day12 }> {
     type Parsed = CaveGraph;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(CaveGraph::from_str(input).expect("failed to parse input"))
+        CaveGraph::from_str(input).context("failed to parse input")
     }
 }
 

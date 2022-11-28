@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::Result;
+use anyhow::{Result, Context};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 fn most_common_elements(lines: &[String]) -> Vec<char> {
@@ -68,7 +68,7 @@ impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2021<{ Day::Day3 }> {
         }
 
         let oxygen_gen_rate = u32::from_str_radix(&oxygen_gen_lines[0], 2)?;
-        let co2_gen_rate = u32::from_str_radix(&co2_gen_lines[0], 2).unwrap();
+        let co2_gen_rate = u32::from_str_radix(&co2_gen_lines[0], 2).context("failed to parse u32")?;
         Ok(oxygen_gen_rate * co2_gen_rate)
     }
 }

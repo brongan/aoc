@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::Context;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -97,7 +97,7 @@ impl FromStr for BingoGame {
                 .chunks(BOARD_SIZE)
                 .map(|chonk| parse_bingo_board(chonk.to_vec()))
                 .collect::<Option<Vec<BingoBoard>>>()
-                .ok_or_else(|| anyhow!("Failed to parse boards"))?,
+                .context("Failed to parse boards")?,
         })
     }
 }
@@ -140,7 +140,7 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
         while boards.len() > 1 {
             let num = num_iter
                 .next()
-                .ok_or_else(|| anyhow!("inputs don't match"))?;
+                .context("inputs don't match")?;
             for board in &mut boards {
                 pull(board, *num);
             }
@@ -152,7 +152,7 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
         while !is_complete(&board) {
             num = *num_iter
                 .next()
-                .ok_or_else(|| anyhow!("inputs don't match"))?;
+                .context("inputs don't match")?;
             pull(&mut board, num);
         }
         Ok(score(&board, num))
