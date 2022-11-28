@@ -2,6 +2,7 @@
 #![feature(adt_const_params)]
 #![feature(iter_advance_by)]
 #![feature(specialization)]
+#![feature(map_first_last)]
 
 mod day01;
 mod day02;
@@ -20,60 +21,48 @@ mod day14;
 mod day15;
 mod day16;
 mod day17;
-//mod day18;
-//mod day19;
-//mod day20;
-//mod day21;
-//mod day22;
-//mod day23;
-//mod day24;
-//mod day25;
 
-use aoc_runner::{run, Day, SolutionRunner};
-use std::convert::TryFrom;
+use anyhow::anyhow;
+use anyhow::Result;
+use aoc_runner::run_solutions;
+use aoc_runner::Day;
+use aoc_runner::SolutionRunner;
 use std::fs::read_to_string;
-use strum::IntoEnumIterator;
 
 pub struct AOC2021<const DAY: Day>;
 
-fn input(day: &Day) -> String {
+fn input(day: &Day) -> Result<String> {
     let day: u8 = (*day).into();
-    read_to_string(format!("aoc-2021/input/day{:02}.txt", day)).expect("yo input file where you at")
+    match read_to_string(format!("aoc-2021/input/day{:02}.txt", day)) {
+        Ok(s) => Ok(s),
+        Err(e) => Err(e.into()),
+    }
 }
 
-fn solve(day: &Day) {
+fn solve(day: &Day) -> Result<()> {
+    let input = input(day)?;
     match day {
-        Day::Day1 => run!(AOC2021::<{ Day::Day1 }>, &input(day)),
-        Day::Day2 => run!(AOC2021::<{ Day::Day2 }>, &input(day)),
-        Day::Day3 => run!(AOC2021::<{ Day::Day3 }>, &input(day)),
-        Day::Day4 => run!(AOC2021::<{ Day::Day4 }>, &input(day)),
-        Day::Day5 => run!(AOC2021::<{ Day::Day5 }>, &input(day)),
-        Day::Day6 => run!(AOC2021::<{ Day::Day6 }>, &input(day)),
-        Day::Day7 => run!(AOC2021::<{ Day::Day7 }>, &input(day)),
-        Day::Day8 => run!(AOC2021::<{ Day::Day8 }>, &input(day)),
-        Day::Day9 => run!(AOC2021::<{ Day::Day9 }>, &input(day)),
-        Day::Day10 => run!(AOC2021::<{ Day::Day10 }>, &input(day)),
-        Day::Day11 => run!(AOC2021::<{ Day::Day11 }>, &input(day)),
-        Day::Day12 => run!(AOC2021::<{ Day::Day12 }>, &input(day)),
-        Day::Day13 => run!(AOC2021::<{ Day::Day13 }>, &input(day)),
-        Day::Day14 => run!(AOC2021::<{ Day::Day14 }>, &input(day)),
-        Day::Day15 => run!(AOC2021::<{ Day::Day15 }>, &input(day)),
-        Day::Day16 => run!(AOC2021::<{ Day::Day16 }>, &input(day)),
-        Day::Day17 => run!(AOC2021::<{ Day::Day17 }>, &input(day)),
-        _ => panic!("Day not implemented yet"),
-    };
+        Day::Day1 => AOC2021::<{ Day::Day1 }>.run(&input),
+        Day::Day2 => AOC2021::<{ Day::Day2 }>.run(&input),
+        Day::Day3 => AOC2021::<{ Day::Day3 }>.run(&input),
+        Day::Day4 => AOC2021::<{ Day::Day4 }>.run(&input),
+        Day::Day5 => AOC2021::<{ Day::Day5 }>.run(&input),
+        Day::Day6 => AOC2021::<{ Day::Day6 }>.run(&input),
+        Day::Day7 => AOC2021::<{ Day::Day7 }>.run(&input),
+        Day::Day8 => AOC2021::<{ Day::Day8 }>.run(&input),
+        Day::Day9 => AOC2021::<{ Day::Day9 }>.run(&input),
+        Day::Day10 => AOC2021::<{ Day::Day10 }>.run(&input),
+        Day::Day11 => AOC2021::<{ Day::Day11 }>.run(&input),
+        Day::Day12 => AOC2021::<{ Day::Day12 }>.run(&input),
+        Day::Day13 => AOC2021::<{ Day::Day13 }>.run(&input),
+        Day::Day14 => AOC2021::<{ Day::Day14 }>.run(&input),
+        Day::Day15 => AOC2021::<{ Day::Day15 }>.run(&input),
+        Day::Day16 => AOC2021::<{ Day::Day16 }>.run(&input),
+        Day::Day17 => AOC2021::<{ Day::Day17 }>.run(&input),
+        _ => Err(anyhow!("Day not implemented yet")),
+    }
 }
 
 fn main() {
-    if let Some(day) = std::env::args().nth(1) {
-        let day_num = day.parse::<u8>().expect("unable to parse day");
-        let day = Day::try_from(day_num).expect("unable to parse day");
-        eprintln!("Running day: {}", day_num);
-        solve(&day);
-    } else {
-        for day in Day::iter() {
-            println!("Solving AOC 2021 Day: {:?}", day);
-            solve(&day);
-        }
-    }
+    run_solutions(&solve);
 }

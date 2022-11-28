@@ -15,9 +15,13 @@ is_type = "0.2"
 num_enum = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
+anyhow = "1.0"
+thiserror = "1.0"
 
 [workspace.dependencies]
 num_enum = "0.5"
 strum = "0.24"
 strum_macros = "0.24"
 aoc-runner = { path = "." }
+anyhow = "1.0"
+thiserror = "1.0"

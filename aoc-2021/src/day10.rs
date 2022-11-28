@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::str::FromStr;
 
 use super::AOC2021;
@@ -12,12 +13,12 @@ pub enum SyntaxScore {
 impl ParseInput<'_, { Day::Day10 }> for AOC2021<{ Day::Day10 }> {
     type Parsed = Vec<SyntaxScore>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .split('\n')
             .map(SyntaxScore::from_str)
             .map(|x| x.expect("Failed to parse line"))
-            .collect()
+            .collect())
     }
 }
 
@@ -87,12 +88,12 @@ impl Solution<'_, { Day::Day10 }, { Part::One }> for AOC2021<{ Day::Day10 }> {
     type Input = Vec<SyntaxScore>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input
             .iter()
             .filter(|s| s.is_corrupt())
             .map(|s| s.score())
-            .sum()
+            .sum())
     }
 }
 
@@ -100,14 +101,14 @@ impl Solution<'_, { Day::Day10 }, { Part::Two }> for AOC2021<{ Day::Day10 }> {
     type Input = Vec<SyntaxScore>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut completion_scores: Vec<usize> = input
             .iter()
             .filter(|s| s.is_incomplete())
             .map(|s| s.score())
             .collect();
         completion_scores.sort_unstable();
-        completion_scores[completion_scores.len() / 2]
+        Ok(completion_scores[completion_scores.len() / 2])
     }
 }
 
@@ -118,7 +119,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>

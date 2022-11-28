@@ -1,10 +1,14 @@
 #![allow(incomplete_features)]
 #![feature(adt_const_params)]
 #![feature(specialization)]
+#![feature(generic_const_exprs)]
 
+use anyhow::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt::Display;
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use thiserror::Error;
 
 pub mod point2d;
 
@@ -56,29 +60,40 @@ pub enum Part {
     Two,
 }
 
+#[derive(Error, Debug)]
+pub enum AOCError {
+    #[error("Day: {day:?}, Part: {part:?} failed. Actual: {actual} Expected: {expected}")]
+    SolutionMismatch {
+        day: Day,
+        part: Part,
+        actual: String,
+        expected: String,
+    },
+}
+
 pub trait Solution<'a, const DAY: Day, const PART: Part> {
     type Input;
     type Output: Display + Eq + std::fmt::Debug + PartialEq;
 
-    fn solve(&'a self, input: &Self::Input) -> Self::Output;
+    fn solve(&'a self, input: &Self::Input) -> Result<Self::Output>;
 }
 
 pub trait ParseInput<'a, const DAY: Day> {
     type Parsed;
 
-    fn parse_input(&'a self, input: &'a str) -> Self::Parsed;
+    fn parse_input(&'a self, input: &'a str) -> Result<Self::Parsed>;
 }
 
 pub trait SolutionRunner<'a, const DAY: Day> {
-    fn run(&'a self, input: &'a str);
+    fn run(&'a self, input: &'a str) -> Result<()>;
 }
 
 pub trait PartOneVerifier<'a, const DAY: Day, T> {
-    fn test_part1(&'a self, input: &'a str, expected: T) -> Result<(), String>;
+    fn test_part1(&'a self, input: &'a str, expected: T) -> Result<()>;
 }
 
 pub trait PartTwoVerifier<'a, const DAY: Day, T> {
-    fn test_part2(&'a self, input: &'a str, expected: T) -> Result<(), String>;
+    fn test_part2(&'a self, input: &'a str, expected: T) -> Result<()>;
 }
 
 impl<'a, T: 'a, const DAY: Day> SolutionRunner<'a, DAY> for T
@@ -87,12 +102,13 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
-    fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
-        let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed_input);
+    fn run(&'a self, input: &'a str) -> Result<()> {
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
+        let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed_input)?;
         println!("Part One: {}", part1_output);
         println!("Part Two: {}", part2_output);
+        Ok(())
     }
 }
 
@@ -101,11 +117,12 @@ where
     T: ParseInput<'a, DAY>
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
-    default fn run(&'a self, input: &'a str) {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
+    default fn run(&'a self, input: &'a str) -> Result<()> {
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
 
         println!("Part One: {}", part1_output);
+        Ok(())
     }
 }
 
@@ -115,19 +132,18 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
-    fn test_part1(&'a self, input: &'a str, expected: U) -> Result<(), String> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
-        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input);
+    fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
         if output == expected {
             Ok(())
         } else {
-            Err(format!(
-                "Day: {:?}, Part: {:?} failed. Expected: {} Found: {}",
-                DAY,
-                Part::One,
-                expected,
-                output
-            ))
+            Err(anyhow::Error::new(AOCError::SolutionMismatch {
+                day: Day::Day1,
+                part: Part::One,
+                actual: output.to_string(),
+                expected: expected.to_string(),
+            }))
         }
     }
 }
@@ -138,28 +154,38 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
-    fn test_part2(&'a self, input: &'a str, expected: U) -> Result<(), String> {
-        let input = <Self as ParseInput<DAY>>::parse_input(self, input.trim());
-        let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input);
+    fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
+        let input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
         if output == expected {
             Ok(())
         } else {
-            Err(format!(
-                "Day: {:?}, Part: {:?} failed. Expected: {} Found: {}",
-                DAY,
-                Part::Two,
-                expected,
-                output
-            ))
+            Err(anyhow::Error::new(AOCError::SolutionMismatch {
+                day: Day::Day1,
+                part: Part::Two,
+                actual: output.to_string(),
+                expected: expected.to_string(),
+            }))
         }
     }
 }
 
-#[allow(unused_macros)]
-#[macro_export]
-macro_rules! run {
-    ($day: expr, $input: expr) => {{
-        let problem = $day;
-        (&&&problem).run($input)
-    }};
+pub fn run_solutions(solver: &dyn Fn(&Day) -> Result<()>) {
+    if let Some(day) = std::env::args().nth(1) {
+        let day_num = day.parse::<u8>().expect("unable to parse day");
+        let day = Day::try_from(day_num).expect("unable to parse day");
+        eprintln!("Running day: {}", day_num);
+        match solver(&day) {
+            Ok(_) => (),
+            Err(e) => eprintln!("Error: {}", e),
+        }
+    } else {
+        for day in Day::iter() {
+            println!("Solving AOC 2021 Day: {:?}", day);
+            match solver(&day) {
+                Ok(_) => (),
+                Err(e) => eprintln!("Error: {}", e),
+            }
+        }
+    }
 }

@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use anyhow::Result;
 use aoc_runner::ParseInput;
 use aoc_runner::{Day, Solution, Part};
 use super::AOC2021;
@@ -42,7 +43,7 @@ fn parse_scanner(lines: &str) -> ScanResult {
 impl ParseInput<'_, {Day::Day19}> for AOC2021<{Day::Day19}> {
     type Parsed = Vec<ScanResult>;
     
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
     input
         .split("\n\n")
         .map(|lines| parse_scanner(lines))
@@ -66,7 +67,7 @@ mod tests {
     }
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input: &str = "
             --- scanner 0 ---
             404,-588,-901
@@ -227,7 +228,7 @@ impl Solution<'_, { Day::Day19 }, { Part::One }> for AOC2021<{ Day::Day19 }> {
     type Input = ScanResult;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let (beacons, _scanners) = find_positions(input.clone());
         beacons.len()
     }

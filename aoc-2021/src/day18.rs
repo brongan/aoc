@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 use nom::{
@@ -167,7 +168,7 @@ fn snail_number(input: &str) -> IResult<&str, SnailFishNumber> {
 impl ParseInput<'_, { Day::Day18 }> for AOC2021<{ Day::Day18 }> {
     type Parsed = Vec<Rc<RefCell<SnailFishNumber>>>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         input.lines().map(|l| snail_number(l).expect("failed to parse line")).map(|(_, v)| Rc::new(RefCell::new(v))).collect()
     }
 }
@@ -176,7 +177,7 @@ impl Solution<'_, { Day::Day18 }, { Part::One }> for AOC2021<{ Day::Day18 }> {
     type Input = Vec<Rc<RefCell<SnailFishNumber>>>;
     type Output = u32;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let sum: SnailFishNumber = input.clone().into_iter().sum();
         sum.magnitude()
     }

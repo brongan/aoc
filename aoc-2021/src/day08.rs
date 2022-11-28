@@ -1,3 +1,5 @@
+use anyhow::anyhow;
+use anyhow::Result;
 use enumset::{enum_set, EnumSetType};
 
 use super::AOC2021;
@@ -13,20 +15,22 @@ pub struct Entry {
 impl ParseInput<'_, { Day::Day8 }> for AOC2021<{ Day::Day8 }> {
     type Parsed = Vec<Entry>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .trim()
             .lines()
             .map(Entry::from_str)
             .map(|r| r.expect("failed to parse entry"))
-            .collect()
+            .collect())
     }
 }
 
 impl FromStr for Entry {
-    type Err = std::string::ParseError;
+    type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (signal, output) = s.split_once('|').expect("Failed to split line");
+        let (signal, output) = s
+            .split_once('|')
+            .ok_or_else(|| anyhow!("Failed to split line"))?;
         let signal = signal
             .split(' ')
             .map(|word| word.chars().collect())
@@ -43,8 +47,8 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2021<{ Day::Day8 }> {
     type Input = Vec<Entry>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input
             .iter()
             .map(|entry| {
                 entry
@@ -55,7 +59,7 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2021<{ Day::Day8 }> {
                     })
                     .count()
             })
-            .sum()
+            .sum())
     }
 }
 
@@ -86,7 +90,7 @@ impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2021<{ Day::Day8 }> {
     type Input = Vec<Entry>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         // len() == 2 => 1
         // len() == 4 => 4
         // len() == 3 => 7
@@ -184,7 +188,7 @@ impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2021<{ Day::Day8 }> {
             Digit::Digit9,
         );
 
-        input
+        Ok(input
             .iter()
             .map(|entry| {
                 entry
@@ -195,7 +199,7 @@ impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2021<{ Day::Day8 }> {
                     })
                     .count()
             })
-            .sum()
+            .sum())
     }
 }
 
@@ -206,7 +210,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "
 be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb |fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec |fcgedb cgb dgebacf gc

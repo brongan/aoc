@@ -1,3 +1,5 @@
+use anyhow::anyhow;
+use anyhow::Result;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -79,8 +81,8 @@ fn score(board: &BingoBoard, num: u32) -> u32 {
 }
 
 impl FromStr for BingoGame {
-    type Err = std::string::ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self> {
         let mut lines = s.lines();
         let first_line = lines.next().unwrap();
         let input: Vec<u32> = first_line
@@ -95,7 +97,7 @@ impl FromStr for BingoGame {
                 .chunks(BOARD_SIZE)
                 .map(|chonk| parse_bingo_board(chonk.to_vec()))
                 .collect::<Option<Vec<BingoBoard>>>()
-                .expect("Failed to parse boards"),
+                .ok_or_else(|| anyhow!("Failed to parse boards"))?,
         })
     }
 }
@@ -103,8 +105,8 @@ impl FromStr for BingoGame {
 impl ParseInput<'_, { Day::Day4 }> for AOC2021<{ Day::Day4 }> {
     type Parsed = BingoGame;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        BingoGame::from_str(input).expect("Failed to parse input file")
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(BingoGame::from_str(input)?)
     }
 }
 
@@ -114,16 +116,16 @@ impl Solution<'_, { Day::Day4 }, { Part::One }> for AOC2021<{ Day::Day4 }> {
 
     // the chosen number is marked on all boards on which it appears.
     // (Numbers may not appear on all boards.)
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut boards = input.boards.clone();
         for num in &input.input {
             for board in &mut boards {
                 if pull(board, *num) && is_complete(board) {
-                    return score(board, *num);
+                    return Ok(score(board, *num));
                 }
             }
         }
-        0
+        Ok(0)
     }
 }
 
@@ -132,11 +134,13 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
     type Output = u32;
 
     // Figure out which board will win last. Once it wins, what would its final score be?
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut num_iter = input.input.iter();
         let mut boards = input.boards.clone();
         while boards.len() > 1 {
-            let num = num_iter.next().expect("inputs don't match");
+            let num = num_iter
+                .next()
+                .ok_or_else(|| anyhow!("inputs don't match"))?;
             for board in &mut boards {
                 pull(board, *num);
             }
@@ -146,10 +150,12 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
         let mut board = boards[0];
         let mut num: u32 = 0;
         while !is_complete(&board) {
-            num = *num_iter.next().expect("inputs don't match");
+            num = *num_iter
+                .next()
+                .ok_or_else(|| anyhow!("inputs don't match"))?;
             pull(&mut board, num);
         }
-        score(&board, num)
+        Ok(score(&board, num))
     }
 }
 
@@ -183,8 +189,8 @@ mod tests {
     }
 
     #[test]
-    fn test_parsing() {
-        let game = BingoGame::from_str(&input()).expect("Failed to parse input file");
+    fn test_parsing() -> Result<()> {
+        let game = BingoGame::from_str(&input())?;
         let expected_input = vec![
             7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19,
             3, 26, 1,
@@ -213,10 +219,11 @@ mod tests {
         assert_eq!(boards[0], expected_first_board);
         assert_eq!(boards[1], expected_second_board);
         assert_eq!(boards[2], expected_third_board);
+        Ok(())
     }
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day4 }>;
         problem.test_part1(&input(), 4512)?;
         problem.test_part2(&input(), 1924)

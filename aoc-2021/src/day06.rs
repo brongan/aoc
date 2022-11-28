@@ -1,10 +1,11 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 impl ParseInput<'_, { Day::Day6 }> for AOC2021<{ Day::Day6 }> {
     type Parsed = [u64; 9];
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         let mut counts = [0u64; 9];
         for num in input
             .trim()
@@ -13,7 +14,7 @@ impl ParseInput<'_, { Day::Day6 }> for AOC2021<{ Day::Day6 }> {
         {
             counts[num] += 1;
         }
-        counts
+        Ok(counts)
     }
 }
 
@@ -33,8 +34,8 @@ impl Solution<'_, { Day::Day6 }, { Part::One }> for AOC2021<{ Day::Day6 }> {
     type Input = [u64; 9];
     type Output = u64;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        solve(*input, 80)
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(solve(*input, 80))
     }
 }
 
@@ -42,8 +43,8 @@ impl Solution<'_, { Day::Day6 }, { Part::Two }> for AOC2021<{ Day::Day6 }> {
     type Input = [u64; 9];
     type Output = u64;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        solve(*input, 256)
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(solve(*input, 256))
     }
 }
 
@@ -54,7 +55,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day6 }>;
         problem.test_part1("3,4,3,1,2", 5934)?;
         problem.test_part2("3,4,3,1,2", 26984457539)

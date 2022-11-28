@@ -14,3 +14,4 @@ nom = "7.1.1"
 num_enum.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
+anyhow.workspace = true

@@ -4,6 +4,8 @@ use std::{
 };
 
 use super::AOC2021;
+use anyhow::anyhow;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
@@ -97,8 +99,8 @@ impl CaveGraph {
 }
 
 impl FromStr for CaveGraph {
-    type Err = std::string::ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self> {
         let mut edgelists: HashMap<Node, Vec<Node>> = HashMap::new();
         for line in s.split('\n') {
             let nodes = line
@@ -109,7 +111,7 @@ impl FromStr for CaveGraph {
                         Node::from_str(e.1).expect("Failed to parse node"),
                     )
                 })
-                .expect("failed to parse line");
+                .ok_or_else(|| anyhow!("failed to parse line"))?;
             edgelists
                 .entry(nodes.0.clone())
                 .or_insert(Vec::new())
@@ -124,8 +126,8 @@ impl FromStr for CaveGraph {
 impl ParseInput<'_, { Day::Day12 }> for AOC2021<{ Day::Day12 }> {
     type Parsed = CaveGraph;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        CaveGraph::from_str(input).expect("failed to parse input")
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(CaveGraph::from_str(input).expect("failed to parse input"))
     }
 }
 
@@ -133,8 +135,8 @@ impl Solution<'_, { Day::Day12 }, { Part::One }> for AOC2021<{ Day::Day12 }> {
     type Input = CaveGraph;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input.find_all_paths(0).len()
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input.find_all_paths(0).len())
     }
 }
 
@@ -142,8 +144,8 @@ impl Solution<'_, { Day::Day12 }, { Part::Two }> for AOC2021<{ Day::Day12 }> {
     type Input = CaveGraph;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        input.find_all_paths(1).len()
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(input.find_all_paths(1).len())
     }
 }
 
@@ -154,7 +156,7 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let input = "fs-end
 he-DX
 fs-he

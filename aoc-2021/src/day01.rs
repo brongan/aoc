@@ -1,17 +1,18 @@
 use super::AOC2021;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
+use anyhow::Result;
 use std::iter::zip;
 
 impl ParseInput<'_, { Day::Day1 }> for AOC2021<{ Day::Day1 }> {
     type Parsed = Vec<u32>;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
-        input
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        Ok(input
             .lines()
             .into_iter()
             .map(|s| s.parse::<u32>().expect("Failed to parse input"))
-            .collect()
+            .collect())
     }
 }
 
@@ -19,10 +20,10 @@ impl Solution<'_, { Day::Day1 }, { Part::One }> for AOC2021<{ Day::Day1 }> {
     type Input = Vec<u32>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
-        1 + zip(input.iter(), input[1..].iter())
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(1 + zip(input.iter(), input[1..].iter())
             .filter(|(first, second)| second > first && **first != 0)
-            .count()
+            .count())
     }
 }
 
@@ -30,7 +31,7 @@ impl Solution<'_, { Day::Day1 }, { Part::Two }> for AOC2021<{ Day::Day1 }> {
     type Input = Vec<u32>;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut count: Self::Output = 1;
         let mut old_sum: u32 = input[0..3].iter().sum();
         let mut new_sum;
@@ -41,6 +42,6 @@ impl Solution<'_, { Day::Day1 }, { Part::Two }> for AOC2021<{ Day::Day1 }> {
             }
             old_sum = new_sum
         }
-        count
+        Ok(count)
     }
 }

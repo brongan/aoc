@@ -1,4 +1,5 @@
 use super::AOC2021;
+use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use itertools::Itertools;
 use std::{collections::HashSet, str::FromStr};
@@ -48,7 +49,7 @@ pub struct Manual {
 impl ParseInput<'_, { Day::Day13 }> for AOC2021<{ Day::Day13 }> {
     type Parsed = Manual;
 
-    fn parse_input(&self, input: &'_ str) -> Self::Parsed {
+    fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         let input = input.trim().split_once("\n\n").expect("invalid input");
         let points: Vec<Point> = input
             .0
@@ -63,10 +64,10 @@ impl ParseInput<'_, { Day::Day13 }> for AOC2021<{ Day::Day13 }> {
                 FoldInstruction::from_str(line.trim()).expect("Failed to parse instruction")
             })
             .collect();
-        Manual {
+        Ok(Manual {
             points,
             instructions,
-        }
+        })
     }
 }
 
@@ -116,7 +117,7 @@ impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2021<{ Day::Day13 }> {
     type Input = Manual;
     type Output = usize;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut points = input.points.clone();
         fold(
             &mut points,
@@ -126,7 +127,7 @@ impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2021<{ Day::Day13 }> {
                 .expect("Need at least one instruction"),
         );
 
-        HashSet::<Point>::from_iter(points.into_iter()).len()
+        Ok(HashSet::<Point>::from_iter(points.into_iter()).len())
     }
 }
 
@@ -134,13 +135,13 @@ impl Solution<'_, { Day::Day13 }, { Part::Two }> for AOC2021<{ Day::Day13 }> {
     type Input = Manual;
     type Output = String;
 
-    fn solve(&self, input: &Self::Input) -> Self::Output {
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut points = input.points.clone();
         input
             .instructions
             .iter()
             .for_each(|instruction| fold(&mut points, instruction));
-        print_paper(&points)
+        Ok(print_paper(&points))
     }
 }
 
@@ -181,9 +182,9 @@ fold along x=5";
 #####";
 
     #[test]
-    fn test_example() {
+    fn test_example() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day13 }>;
-        let mut parsed = problem.parse_input(EXAMPLE_INPUT);
+        let mut parsed = problem.parse_input(EXAMPLE_INPUT)?;
         let expected_paper = "
 ...#..#..#.
 ....#......
@@ -221,10 +222,11 @@ fold along x=5";
             print_paper(&parsed.points).trim(),
             EXAMPLE_PART2_RESULT.trim().to_owned()
         );
+        Ok(())
     }
 
     #[test]
-    fn test() -> Result<(), String> {
+    fn test() -> Result<()> {
         let problem = super::AOC2021::<{ Day::Day13 }>;
 
         problem.test_part1(EXAMPLE_INPUT, 17)?;
