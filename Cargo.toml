@@ -25,3 +25,4 @@ strum_macros = "0.24"
 aoc-runner = { path = "." }
 anyhow = "1.0"
 thiserror = "1.0"
+counter = "0.5"
