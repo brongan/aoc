@@ -1,4 +1,4 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use std::collections::{HashSet, VecDeque};
 
 use super::AOC2021;
@@ -16,7 +16,7 @@ impl ParseInput<'_, { Day::Day9 }> for AOC2021<{ Day::Day9 }> {
                     .map(|digit| digit.to_digit(10).context("Expected Digit"))
                     .collect()
             })
-        .collect()
+            .collect()
     }
 }
 

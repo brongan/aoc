@@ -1,6 +1,6 @@
 use super::AOC2021;
-use anyhow::Context;
 use anyhow::anyhow;
+use anyhow::Context;
 use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::ops::Range;

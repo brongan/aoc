@@ -1,5 +1,5 @@
-use anyhow::Result;
 use anyhow::Context;
+use anyhow::Result;
 use std::fmt::Debug;
 use std::str::FromStr;
 
@@ -138,9 +138,7 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
         let mut num_iter = input.input.iter();
         let mut boards = input.boards.clone();
         while boards.len() > 1 {
-            let num = num_iter
-                .next()
-                .context("inputs don't match")?;
+            let num = num_iter.next().context("inputs don't match")?;
             for board in &mut boards {
                 pull(board, *num);
             }
@@ -150,9 +148,7 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2021<{ Day::Day4 }> {
         let mut board = boards[0];
         let mut num: u32 = 0;
         while !is_complete(&board) {
-            num = *num_iter
-                .next()
-                .context("inputs don't match")?;
+            num = *num_iter.next().context("inputs don't match")?;
             pull(&mut board, num);
         }
         Ok(score(&board, num))

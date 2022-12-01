@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use core::panic;
 use std::cmp::Ordering;
@@ -22,7 +22,7 @@ impl ParseInput<'_, { Day::Day15 }> for AOC2021<{ Day::Day15 }> {
                     .map(|c| c.to_digit(10).context("invalid digit"))
                     .collect()
             })
-        .collect::<Result<Vec<Vec<u32>>>>()
+            .collect::<Result<Vec<Vec<u32>>>>()
     }
 }
 

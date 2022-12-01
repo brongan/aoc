@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::collections::HashMap;
 
@@ -33,7 +33,7 @@ impl ParseInput<'_, { Day::Day14 }> for AOC2021<{ Day::Day14 }> {
                     terms.1.chars().next().context("invalid rule")?,
                 ))
             })
-            .collect::<Result<HashMap<(char,char), char>>>()?;
+            .collect::<Result<HashMap<(char, char), char>>>()?;
         Ok(Input { template, rules })
     }
 }
@@ -63,7 +63,12 @@ fn run_polymerization(
     for (_c, count) in char_counts.iter_mut() {
         *count /= 2;
     }
-    Ok(char_counts.values().max().context("need at least one char_count")? - char_counts.values().min().unwrap() + 1)
+    Ok(char_counts
+        .values()
+        .max()
+        .context("need at least one char_count")?
+        - char_counts.values().min().unwrap()
+        + 1)
 }
 
 impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2021<{ Day::Day14 }> {

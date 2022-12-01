@@ -8,8 +8,8 @@ mod day01;
 mod day02;
 mod day03;
 
-use anyhow::Context;
 use anyhow::anyhow;
+use anyhow::Context;
 use anyhow::Result;
 use aoc_runner::run_solutions;
 use aoc_runner::Day;
@@ -37,4 +37,3 @@ fn solve(day: &Day) -> Result<()> {
 fn main() {
     run_solutions(&solve);
 }
-

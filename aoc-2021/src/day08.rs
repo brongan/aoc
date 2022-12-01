@@ -28,9 +28,7 @@ impl ParseInput<'_, { Day::Day8 }> for AOC2021<{ Day::Day8 }> {
 impl FromStr for Entry {
     type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (signal, output) = s
-            .split_once('|')
-            .context("failed to split line")?;
+        let (signal, output) = s.split_once('|').context("failed to split line")?;
         let signal = signal
             .split(' ')
             .map(|word| word.chars().collect())
