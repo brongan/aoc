@@ -16,7 +16,9 @@ impl FromStr for FoldInstruction {
     type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self> {
         let mut equation = s.chars();
-        equation.advance_by(11).map_err(|e| anyhow!(format!("Equation didn't have enough chars: {}", e)))?;
+        equation
+            .advance_by(11)
+            .map_err(|e| anyhow!(format!("Equation didn't have enough chars: {}", e)))?;
         let equation = equation
             .as_str()
             .split_once('=')
@@ -24,16 +26,16 @@ impl FromStr for FoldInstruction {
         match equation.0 {
             "x" => Ok(FoldInstruction::X(
                 equation
-                .1
-                .parse()
-                .context("failed to parse fold equation line")?,
-                )),
+                    .1
+                    .parse()
+                    .context("failed to parse fold equation line")?,
+            )),
             "y" => Ok(FoldInstruction::Y(
                 equation
-                .1
-                .parse()
-                .context("failed to parse fold equation line")?,
-                )),
+                    .1
+                    .parse()
+                    .context("failed to parse fold equation line")?,
+            )),
             _ => Err(anyhow!("bad equation")),
         }
     }

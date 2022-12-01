@@ -22,14 +22,14 @@ impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
                         .next()
                         .context("Missing first word on line")?
                         .to_string(),
-                        dist: words
-                            .next()
+                    dist: words
+                        .next()
                         .context("Missing second word on line")?
-                            .parse::<u32>()
-                            .context("Failed to parse input")?,
+                        .parse::<u32>()
+                        .context("Failed to parse input")?,
                 })
             })
-        .collect()
+            .collect()
     }
 }
 

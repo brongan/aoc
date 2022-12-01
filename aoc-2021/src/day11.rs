@@ -1,5 +1,5 @@
 use super::AOC2021;
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use std::collections::{BTreeSet, HashSet};
 
@@ -14,7 +14,7 @@ impl ParseInput<'_, { Day::Day11 }> for AOC2021<{ Day::Day11 }> {
                     .map(|c| c.to_digit(10).context("failed to parse digit"))
                     .collect()
             })
-        .collect()
+            .collect()
     }
 }
 
