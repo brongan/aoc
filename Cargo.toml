@@ -3,6 +3,7 @@ cargo-features = ["workspace-inheritance"]
 members = [
     "aoc-2015",
     "aoc-2021",
+    "aoc-2022",
 ]
 
 [package]
