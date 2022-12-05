@@ -7,6 +7,7 @@
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 
 use anyhow::anyhow;
 use anyhow::Context;
@@ -29,7 +30,7 @@ fn solve(day: &Day) -> Result<()> {
     match day {
         Day::Day1 => AOC2022::<{ Day::Day1 }>.run(&input),
         Day::Day2 => AOC2022::<{ Day::Day2 }>.run(&input),
-        Day::Day3 => AOC2022::<{ Day::Day3 }>.run(&input),
+        Day::Day4 => AOC2022::<{ Day::Day4 }>.run(&input),
         _ => Err(anyhow!("Day not implemented yet")),
     }
 }
