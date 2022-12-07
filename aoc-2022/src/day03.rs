@@ -14,7 +14,9 @@ pub struct Rucksack {
 
 impl std::fmt::Debug for Rucksack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Rucksack").field("contents", &self.union()).finish()
+        f.debug_struct("Rucksack")
+            .field("contents", &self.union())
+            .finish()
     }
 }
 
@@ -105,7 +107,10 @@ impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2022<{ Day::Day3 }> {
                         .collect::<HashSet<_>>()
                         .intersection(&rucksacks[2].union())
                         .next()
-                        .context(format!("no intersection between elves in group {}: {:?}", i, rucksacks))?,
+                        .context(format!(
+                            "no intersection between elves in group {}: {:?}",
+                            i, rucksacks
+                        ))?,
                 )
             })
             .sum()
