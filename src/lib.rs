@@ -103,7 +103,7 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     fn run(&'a self, input: &'a str) -> Result<()> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
         let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed_input)?;
         println!("Part One: {}", part1_output);
@@ -118,7 +118,7 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     default fn run(&'a self, input: &'a str) -> Result<()> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
 
         println!("Part One: {}", part1_output);
@@ -133,7 +133,7 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
     fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
         if output == expected {
             Ok(())
@@ -155,7 +155,7 @@ where
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
     fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
-        let input = <Self as ParseInput<DAY>>::parse_input(self, input.trim())?;
+        let input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
         if output == expected {
             Ok(())
