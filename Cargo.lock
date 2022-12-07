@@ -46,6 +46,7 @@ dependencies = [
  "aoc-runner",
  "counter",
  "itertools",
+ "nom",
  "num_enum",
  "strum",
  "strum_macros",
