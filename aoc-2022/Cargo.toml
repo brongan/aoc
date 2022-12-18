@@ -15,3 +15,4 @@ anyhow.workspace = true
 counter.workspace = true
 itertools = "0.10.5"
 nom = "7.1"
+camino = "1.0"
