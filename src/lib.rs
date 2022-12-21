@@ -135,16 +135,8 @@ where
     fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
         let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
-        if output == expected {
-            Ok(())
-        } else {
-            Err(anyhow::Error::new(AOCError::SolutionMismatch {
-                day: Day::Day1,
-                part: Part::One,
-                actual: output.to_string(),
-                expected: expected.to_string(),
-            }))
-        }
+        assert_eq!(output, expected);
+        Ok(())
     }
 }
 
@@ -157,16 +149,8 @@ where
     fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
         let input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
-        if output == expected {
-            Ok(())
-        } else {
-            Err(anyhow::Error::new(AOCError::SolutionMismatch {
-                day: Day::Day1,
-                part: Part::Two,
-                actual: output.to_string(),
-                expected: expected.to_string(),
-            }))
-        }
+        assert_eq!(output, expected);
+        Ok(())
     }
 }
 
