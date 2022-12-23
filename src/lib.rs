@@ -9,6 +9,7 @@ use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use thiserror::Error;
+use pretty_assertions::assert_eq;
 
 pub mod point2d;
 

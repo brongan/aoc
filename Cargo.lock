@@ -62,6 +62,7 @@ dependencies = [
  "anyhow",
  "is_type",
  "num_enum",
+ "pretty_assertions",
  "strum",
  "strum_macros",
  "thiserror",
