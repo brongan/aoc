@@ -1,4 +1,3 @@
-cargo-features = ["workspace-inheritance"]
 [workspace]
 members = [
     "aoc-2015",

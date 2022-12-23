@@ -24,7 +24,7 @@ pub struct AOC2022<const DAY: Day>;
 
 fn input(day: &Day) -> Result<String> {
     let day: u8 = (*day).into();
-    let path = format!("aoc-2022/input/day{}.txt", day);
+    let path = format!("aoc-2022/input/day{day}.txt");
     read_to_string(&path).context(path)
 }
 
