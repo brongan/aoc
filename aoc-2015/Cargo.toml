@@ -11,5 +11,5 @@ strum.workspace = true
 strum_macros.workspace = true
 anyhow.workspace = true
 counter.workspace = true
+itertools.workspace = true
 md5 = "0.7"
-itertools = "0.10"
