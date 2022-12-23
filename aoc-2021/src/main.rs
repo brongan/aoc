@@ -2,7 +2,6 @@
 #![feature(adt_const_params)]
 #![feature(iter_advance_by)]
 #![feature(specialization)]
-#![feature(map_first_last)]
 
 mod day01;
 mod day02;
@@ -33,7 +32,7 @@ pub struct AOC2021<const DAY: Day>;
 
 fn input(day: &Day) -> Result<String> {
     let day: u8 = (*day).into();
-    match read_to_string(format!("aoc-2021/input/day{:02}.txt", day)) {
+    match read_to_string(format!("aoc-2021/input/day{day}.txt")) {
         Ok(s) => Ok(s),
         Err(e) => Err(e.into()),
     }
