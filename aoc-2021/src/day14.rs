@@ -85,7 +85,7 @@ impl Solution<'_, { Day::Day14 }, { Part::Two }> for AOC2021<{ Day::Day14 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(run_polymerization(&input.template, &input.rules, 40)?)
+        run_polymerization(&input.template, &input.rules, 40)
     }
 }
 

@@ -19,7 +19,7 @@ impl Solution<'_, { Day::Day4 }, { Part::One }> for AOC2015<{ Day::Day4 }> {
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut i = 0;
         loop {
-            let hash = md5::compute(format!("{}{}", input, i));
+            let hash = md5::compute(format!("{input}{i}"));
             if hash[0] == 0 && hash[1] == 0 && hash[2] < 16 {
                 return Ok(i);
             }
@@ -35,7 +35,7 @@ impl Solution<'_, { Day::Day4 }, { Part::Two }> for AOC2015<{ Day::Day4 }> {
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let mut i = 0;
         loop {
-            let hash = md5::compute(format!("{}{}", input, i));
+            let hash = md5::compute(format!("{input}{i}"));
             if hash[0] == 0 && hash[1] == 0 && hash[2] == 0 {
                 return Ok(i);
             }

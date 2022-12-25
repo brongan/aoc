@@ -114,7 +114,7 @@ fn eval_instruction1(state: &mut [Stack], instruction: &Instruction) {
 
 fn eval_instruction2(state: &mut [Stack], instruction: &Instruction) {
     let from = &mut state[instruction.from - 1];
-    let mut crates = from.split_off(from.len() - instruction.num_crates as usize);
+    let mut crates = from.split_off(from.len() - instruction.num_crates);
     let to = &mut state[instruction.to - 1];
     to.append(&mut crates);
 }

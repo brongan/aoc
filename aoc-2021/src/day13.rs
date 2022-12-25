@@ -18,7 +18,7 @@ impl FromStr for FoldInstruction {
         let mut equation = s.chars();
         equation
             .advance_by(11)
-            .map_err(|e| anyhow!(format!("Equation didn't have enough chars: {}", e)))?;
+            .map_err(|e| -> anyhow::Error {anyhow!(format!("Equation didn't have enough chars: {e}"))})?;
         let equation = equation
             .as_str()
             .split_once('=')
@@ -144,7 +144,7 @@ impl Solution<'_, { Day::Day13 }, { Part::Two }> for AOC2021<{ Day::Day13 }> {
             .instructions
             .iter()
             .for_each(|instruction| fold(&mut points, instruction));
-        Ok(print_paper(&points)?)
+        print_paper(&points)
     }
 }
 

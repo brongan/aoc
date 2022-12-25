@@ -5,11 +5,11 @@
 
 use anyhow::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+use pretty_assertions::assert_eq;
 use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use thiserror::Error;
-use pretty_assertions::assert_eq;
 
 pub mod point2d;
 
@@ -104,11 +104,11 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     fn run(&'a self, input: &'a str) -> Result<()> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
-        let part2_output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed_input)?;
-        println!("Part One: {}", part1_output);
-        println!("Part Two: {}", part2_output);
+        let parsed = <Self as ParseInput<DAY>>::parse_input(self, input)?;
+        let part1 = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed)?;
+        let part2 = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed)?;
+        println!("Part One: {part1}");
+        println!("Part Two: {part2}");
         Ok(())
     }
 }
@@ -119,10 +119,10 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed>,
 {
     default fn run(&'a self, input: &'a str) -> Result<()> {
-        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
-        let part1_output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
+        let parsed = <Self as ParseInput<DAY>>::parse_input(self, input)?;
+        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed)?;
 
-        println!("Part One: {}", part1_output);
+        println!("Part One: {output}");
         Ok(())
     }
 }
@@ -159,17 +159,17 @@ pub fn run_solutions(solver: &dyn Fn(&Day) -> Result<()>) {
     if let Some(day) = std::env::args().nth(1) {
         let day_num = day.parse::<u8>().expect("unable to parse day");
         let day = Day::try_from(day_num).expect("unable to parse day");
-        eprintln!("Running day: {}", day_num);
+        eprintln!("Running day: {day_num}");
         match solver(&day) {
             Ok(_) => (),
-            Err(e) => eprintln!("Error: {}", e),
+            Err(e) => eprintln!("Error: {e}"),
         }
     } else {
         for day in Day::iter() {
-            println!("Solving AOC 2021 Day: {:?}", day);
+            println!("Solving AOC 2021 Day: {day:?}");
             match solver(&day) {
                 Ok(_) => (),
-                Err(e) => eprintln!("Error: {}", e),
+                Err(e) => eprintln!("Error: {e}"),
             }
         }
     }

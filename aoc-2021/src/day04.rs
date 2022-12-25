@@ -106,7 +106,7 @@ impl ParseInput<'_, { Day::Day4 }> for AOC2021<{ Day::Day4 }> {
     type Parsed = BingoGame;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(BingoGame::from_str(input)?)
+        BingoGame::from_str(input)
     }
 }
 
