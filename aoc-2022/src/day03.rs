@@ -108,8 +108,7 @@ impl Solution<'_, { Day::Day3 }, { Part::Two }> for AOC2022<{ Day::Day3 }> {
                         .intersection(&rucksacks[2].union())
                         .next()
                         .context(format!(
-                            "no intersection between elves in group {}: {:?}",
-                            i, rucksacks
+                            "no intersection between elves in group {i}: {rucksacks:?}"
                         ))?,
                 )
             })

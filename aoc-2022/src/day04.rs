@@ -1,33 +1,33 @@
-use std::str::FromStr;
+    use std::str::FromStr;
 
-use super::AOC2022;
-use anyhow::Error;
-use aoc_runner::{Day, ParseInput, Part, Solution};
+    use super::AOC2022;
+    use anyhow::Error;
+    use aoc_runner::{Day, ParseInput, Part, Solution};
 
-use anyhow::Context;
-use anyhow::Result;
+    use anyhow::Context;
+    use anyhow::Result;
 
-pub struct Range<T> {
-    min: T,
-    max: T,
-}
-
-impl<T> Range<T>
-where
-    T: std::cmp::Ord,
-{
-    fn contains(&self, other: &Range<T>) -> bool {
-        self.min <= other.min && self.max >= other.max
+    pub struct Range<T> {
+        min: T,
+        max: T,
     }
 
-    fn bi_contains(&self, other: &Range<T>) -> bool {
-        self.contains(other) || other.contains(self)
-    }
+    impl<T> Range<T>
+    where
+        T: std::cmp::Ord,
+    {
+        fn contains(&self, other: &Range<T>) -> bool {
+            self.min <= other.min && self.max >= other.max
+        }
 
-    fn overlaps(&self, other: &Range<T>) -> bool {
-        (self.min <= other.max && self.max >= other.min)
-            || (other.min <= self.max && other.max >= self.min)
-    }
+        fn bi_contains(&self, other: &Range<T>) -> bool {
+            self.contains(other) || other.contains(self)
+        }
+
+        fn overlaps(&self, other: &Range<T>) -> bool {
+            (self.min <= other.max && self.max >= other.min)
+                || (other.min <= self.max && other.max >= self.min)
+        }
 }
 
 fn parse_pair<T: FromStr>(s: &str, separator: char) -> Option<(T, T)> {

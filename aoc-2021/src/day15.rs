@@ -122,7 +122,7 @@ fn print_map(map: &[Vec<u32>], prev: &HashSet<Point>) {
             if prev.contains(&(i, j)) {
                 print!("{}", elem.to_string().bright_red());
             } else {
-                print!("{}", elem);
+                print!("{elem}");
             }
         }
         println!();

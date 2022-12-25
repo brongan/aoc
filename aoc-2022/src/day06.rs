@@ -23,7 +23,6 @@ fn first_unique_window(s: &str, size: usize) -> Result<usize> {
         counter[c] += 1;
         counter.retain(|_, &mut v| v > 0);
         if counter.len() == size {
-            eprintln!("{}: {:?}", i, counter);
             return Ok(1 + i + size);
         }
     }

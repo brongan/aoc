@@ -51,7 +51,7 @@ impl ParseInput<'_, { Day::Day17 }> for AOC2021<{ Day::Day17 }> {
     type Parsed = TargetArea;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(TargetArea::from_str(input).context("failed to parse target area")?)
+        TargetArea::from_str(input).context("failed to parse target area")
     }
 }
 
@@ -107,13 +107,13 @@ impl Solution<'_, { Day::Day17 }, { Part::One }> for AOC2021<{ Day::Day17 }> {
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let p = Point2D { x: 0, y: 0 };
-        Ok((0..100)
+        (0..100)
             .flat_map(|dx: i32| {
                 (0..1000)
                     .filter_map(move |dy: i32| trajectory_height(p, Velocity { dx, dy }, input))
             })
             .max()
-            .context("failed to find max")?)
+            .context("failed to find max")
     }
 }
 
