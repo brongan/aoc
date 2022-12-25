@@ -1,32 +1,49 @@
-use std::rc::Rc;
+use std::{rc::Rc, str::FromStr};
 
 use super::AOC2022;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
 use anyhow::{Context, Result};
+use nom::{
+    character::complete::{anychar, newline},
+    combinator::map_res,
+    multi::{many1, separated_list1},
+    Finish, IResult,
+};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 type Tree = u8;
 type Forest = Vec<Vec<Tree>>;
-type ForestView = Rc<Vec<Vec<u8>>>;
+#[derive(Debug)]
+pub struct ForestView(Rc<Forest>);
+
+fn parse_tree(s: &str) -> IResult<&str, Tree> {
+    map_res(anychar, |c| {
+        c.to_digit(10)
+            .map(|n| n as Tree)
+            .context("Failed to parse digit.")
+    })(s)
+}
+
+fn parse_forest(s: &str) -> IResult<&str, Forest> {
+    separated_list1(newline, many1(parse_tree))(s)
+}
+
+impl FromStr for ForestView {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (_, forest) = parse_forest(s).map_err(|e| e.to_owned()).finish()?;
+        Ok(ForestView(Rc::new(forest)))
+    }
+}
 
 impl ParseInput<'_, { Day::Day8 }> for AOC2022<{ Day::Day8 }> {
     type Parsed = ForestView;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        Ok(Rc::new(
-            input
-                .split('\n')
-                .map(|line| -> Result<Vec<u8>, anyhow::Error> {
-                    line.split('\n')
-                        .collect::<String>()
-                        .chars()
-                        .map(|c| c.to_digit(10).context("Invalid digit").map(|c| c as u8))
-                        .collect()
-                })
-                .collect::<Result<Forest>>()?,
-        ))
+        input.parse()
     }
 }
 
@@ -38,30 +55,63 @@ enum Direction {
     Right,
 }
 
-fn is_visible(input: &ForestView, x: usize, y: usize) -> bool {
-    let tree = input[x][y];
-    let trees_between = |direction| -> Box<dyn Iterator<Item = u8>> {
-        match direction {
-            Direction::Up => Box::new((0..y).map(move |y| input[x][y])),
-            Direction::Down => Box::new((y..input[x].len()).map(move |y| input[x][y])),
-            Direction::Left => Box::new((0..x).map(move |x| input[x][y])),
-            Direction::Right => Box::new((x..input.len()).map(move |x| input[x][y])),
-        }
-    };
+struct Visibility {
+    visible: bool,
+    distance: usize,
+}
 
-    println!("is_visible");
+impl ForestView {
+    fn visibility(&self, x: usize, y: usize, direction: Direction) -> Visibility {
+        let forest = &self.0;
+        let tree = forest[x][y];
+        let trees_between = |direction| -> Box<dyn Iterator<Item = u8>> {
+            match direction {
+                Direction::Up => Box::new((0..y).rev().map(move |y| forest[x][y])),
+                Direction::Down => Box::new(((y + 1)..forest[x].len()).map(move |y| forest[x][y])),
+                Direction::Left => Box::new((0..x).rev().map(move |x| forest[x][y])),
+                Direction::Right => Box::new(((x + 1)..forest.len()).map(move |x| forest[x][y])),
+            }
+        };
 
-    for direction in Direction::iter() {
+        let mut distance = 0;
         for other in trees_between(direction) {
-            println!("Tree: {}, other: {}", tree, other);
+            distance += 1;
             if other >= tree {
-                break;
+                return Visibility {
+                    visible: false,
+                    distance,
+                };
             }
         }
-        println!("({},{}) is visible!", x, y);
-        return true;
+        println!("Found visible tree from ({x}, {y}) in direction {direction:?} with distance: {distance}.");
+        Visibility {
+            visible: true,
+            distance,
+        }
     }
-    false
+
+    fn is_visible(&self, x: usize, y: usize) -> bool {
+        Direction::iter()
+            .map(|dir| self.visibility(x, y, dir).visible)
+            .any(|v| v)
+    }
+
+    fn iterator(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (0..self.0.len()).flat_map(move |x| (0..self.0[x].len()).map(move |y| (x, y)))
+    }
+
+    fn tree_score(&self, x: usize, y: usize) -> usize {
+        Direction::iter()
+            .map(|dir| self.visibility(x, y, dir).distance)
+            .product()
+    }
+
+    fn scenic_score(&self) -> Result<usize> {
+        self.iterator()
+            .map(|(x, y)| self.tree_score(x, y))
+            .max()
+            .context("No trees in the forest!")
+    }
 }
 
 impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2022<{ Day::Day8 }> {
@@ -69,30 +119,22 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2022<{ Day::Day8 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let mut visibile = vec![vec![false; input[0].len()]; input.len()];
-        for (x, row) in input.iter().enumerate() {
-            for (y, _) in row.iter().enumerate() {
-                println!("fuck this");
-                visibile[x][y] = is_visible(input, x, y);
-            }
-        }
-        Ok(visibile.iter().flatten().filter(|&&v| v).count())
+        Ok(input
+            .iterator()
+            .map(|(x, y)| input.is_visible(x, y))
+            .filter(|&b| b)
+            .count())
     }
 }
 
-/*
 impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2022<{ Day::Day8 }> {
-    type Input = Input;
-    type Output = u32;
+    type Input = ForestView;
+    type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(sorted(input.iter().map(|elf| elf.iter().sum::<u32>()))
-            .rev()
-            .take(3)
-            .sum())
+        input.scenic_score()
     }
 }
-*/
 
 #[cfg(test)]
 mod tests {
@@ -109,7 +151,13 @@ mod tests {
 65332
 33549
 35390";
-        let problem = super::AOC2022::<{ Day::Day7 }>;
-        problem.test_part1(input, 21)
+        let problem = super::AOC2022::<{ Day::Day8 }>;
+        problem.test_part1("1", 1)?;
+        problem.test_part1("12\n34", 4)?;
+        problem.test_part1(input, 21)?;
+        let parsed = problem.parse_input(input)?;
+        assert_eq!(parsed.0[3][2], 5, "{parsed:?}");
+        assert_eq!(parsed.tree_score(3, 2), 8);
+        Ok(())
     }
 }
