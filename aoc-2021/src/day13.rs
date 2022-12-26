@@ -16,9 +16,9 @@ impl FromStr for FoldInstruction {
     type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self> {
         let mut equation = s.chars();
-        equation
-            .advance_by(11)
-            .map_err(|e| -> anyhow::Error {anyhow!(format!("Equation didn't have enough chars: {e}"))})?;
+        equation.advance_by(11).map_err(|e| -> anyhow::Error {
+            anyhow!(format!("Equation didn't have enough chars: {e}"))
+        })?;
         let equation = equation
             .as_str()
             .split_once('=')
