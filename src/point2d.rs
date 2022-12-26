@@ -7,6 +7,12 @@ pub struct Point2D<T> {
     pub y: T,
 }
 
+impl<T> Point2D<T> {
+    pub fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+}
+
 impl<T> FromStr for Point2D<T>
 where
     T: std::str::FromStr,
