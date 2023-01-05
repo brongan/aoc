@@ -1,17 +1,19 @@
 use std::collections::HashSet;
-use std::str::FromStr;
 
 use super::AOC2022;
 use aoc_runner::point2d::Point2D;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
-use anyhow::{Context, Result};
-use nom::character::complete::{alpha0, digit0, newline, space1};
-use nom::combinator::{map, map_res};
+use anyhow::Result;
+use nom::branch::alt;
+use nom::bytes::complete::tag;
+use nom::character::complete::{newline, space1};
+use nom::combinator::{map, value};
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
 use nom::IResult;
 
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 enum Direction {
     Up,
     Down,
@@ -19,116 +21,114 @@ enum Direction {
     Right,
 }
 
-impl FromStr for Direction {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self> {
-        match s {
-            "U" => Ok(Direction::Up),
-            "D" => Ok(Direction::Down),
-            "L" => Ok(Direction::Left),
-            "R" => Ok(Direction::Right),
-            _ => Err(anyhow::anyhow!("Invalid direction: {s}")),
-        }
+impl Direction {
+    fn parse(input: &str) -> IResult<&str, Self> {
+        alt((
+            value(Direction::Up, tag("U")),
+            value(Direction::Down, tag("D")),
+            value(Direction::Left, tag("L")),
+            value(Direction::Right, tag("R")),
+        ))(input)
     }
 }
 
-pub struct Instruction {
+pub struct Motion {
     direction: Direction,
     distance: i32,
 }
 
-type State = Vec<Point2D<i32>>;
-
-fn parse_instructions(s: &str) -> IResult<&str, Vec<Instruction>> {
-    let parse_direction = map_res(alpha0, Direction::from_str);
-    let parse_distance = map_res(digit0, |s: &str| s.parse());
-    let parse_instruction = map(
-        separated_pair(parse_direction, space1, parse_distance),
-        |(direction, distance)| Instruction {
-            direction,
-            distance,
-        },
-    );
-    separated_list1(newline, parse_instruction)(s)
+impl Motion {
+    fn parse(input: &str) -> IResult<&str, Self> {
+        map(
+            separated_pair(Direction::parse, space1, nom::character::complete::i32),
+            |(direction, distance)| Self {
+                direction,
+                distance,
+            },
+        )(input)
+    }
 }
+
+type Point = Point2D<i32>;
+type State = Vec<Point>;
+type Instruction = Vec<Motion>;
 
 impl ParseInput<'_, { Day::Day9 }> for AOC2022<{ Day::Day9 }> {
-    type Parsed = Vec<Instruction>;
+    type Parsed = Instruction;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        let (_, instructions) = parse_instructions(input).map_err(|e| e.to_owned())?;
-        Ok(instructions)
+        let (_, motions) =
+            separated_list1(newline, Motion::parse)(input).map_err(|e| e.to_owned())?;
+        Ok(motions)
     }
 }
 
-fn simulate_instruction(
-    rope: &mut State,
-    visited: &mut HashSet<Point2D<i32>>,
-    instruction: &Instruction,
-) -> Result<()> {
-    let head = &mut rope.get_mut(0).context("Empty rope.")?;
-    match instruction.direction {
-        Direction::Up => head.y += instruction.distance,
-        Direction::Down => head.y -= instruction.distance,
-        Direction::Left => head.x -= instruction.distance,
-        Direction::Right => head.x += instruction.distance,
-    }
+fn pull(lead: &Point, follow: &mut Point, visited: &mut HashSet<Point>, update: bool) {
+    loop {
+        let delta = *lead - *follow;
 
-    let rope = &mut rope.as_mut_slice();
-    for i in 1..rope.len() {
-        let (first, second) = rope.split_at_mut(i);
-        let lead = first[0];
-        let mut follow = second[0];
+        if delta.x.abs() <= 1 && delta.y.abs() <= 1 {
+            break;
+        }
 
-        loop {
-            let delta_x = lead.x - follow.x;
-            let delta_y = lead.y - follow.y;
+        if delta.x.abs() > 1 && delta.y == 0 {
+            follow.x += delta.x.signum();
+        } else if delta.y.abs() > 1 && delta.x == 0 {
+            follow.y += delta.y.signum();
+        } else {
+            follow.x += delta.x.signum();
+            follow.y += delta.y.signum();
+        }
 
-            if delta_x.abs() <= 1 && delta_y.abs() <= 1 {
-                break;
-            }
-
-            if delta_x.abs() > 1 && delta_y == 0 {
-                follow.x += delta_x.signum();
-            } else if delta_y.abs() > 1 && delta_x == 0 {
-                follow.y += delta_y.signum();
-            } else {
-                follow.x += delta_x.signum();
-                follow.y += delta_y.signum();
-            }
-            visited.insert(follow);
+        if update {
+            visited.insert(*follow);
         }
     }
-    Ok(())
 }
 
-fn simulate_instructions(mut rope: State, instructions: &[Instruction]) -> Result<usize> {
+fn follow_motion(motion: &Motion, rope: &mut State, visited: &mut HashSet<Point>) {
+    let head = rope.first_mut().unwrap();
+    match motion.direction {
+        Direction::Up => head.y += motion.distance,
+        Direction::Down => head.y -= motion.distance,
+        Direction::Left => head.x -= motion.distance,
+        Direction::Right => head.x += motion.distance,
+    }
+
+    let rope_len = rope.len();
+    for i in 1..rope_len {
+        let (left, right) = rope.split_at_mut(i);
+        let lead = left.last().unwrap();
+        let follow = right.first_mut().unwrap();
+        pull(lead, follow, visited, i + 1 == rope_len);
+    }
+}
+
+fn follow_motions(mut rope: State, instructions: &[Motion]) -> usize {
     let mut visited = HashSet::from([Point2D::new(0, 0)]);
     for instruction in instructions {
-        simulate_instruction(&mut rope, &mut visited, instruction)?;
+        follow_motion(instruction, &mut rope, &mut visited);
     }
-    Ok(visited.len())
+    visited.len()
 }
 
 impl Solution<'_, { Day::Day9 }, { Part::One }> for AOC2022<{ Day::Day9 }> {
-    type Input = Vec<Instruction>;
+    type Input = Instruction;
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        simulate_instructions(vec![Point2D::new(0, 0); 2], input)
+        Ok(follow_motions(vec![Point2D::new(0, 0); 2], input))
     }
 }
 
-/*
 impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2022<{ Day::Day9 }> {
-    type Input = Vec<Vec<u32>>;
-    type Output = u32;
+    type Input = Instruction;
+    type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(follow_motions(vec![Point2D::new(0, 0); 10], input))
     }
 }
-*/
 
 #[cfg(test)]
 mod tests {
