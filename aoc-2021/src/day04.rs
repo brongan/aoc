@@ -58,7 +58,6 @@ fn is_complete(board: &BingoBoard) -> bool {
         return true;
     }
     (0..board[0].len())
-        .into_iter()
         .map(|col| {
             board
                 .iter()
