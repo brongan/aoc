@@ -11,7 +11,6 @@ impl ParseInput<'_, { Day::Day1 }> for AOC2021<{ Day::Day1 }> {
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         input
             .lines()
-            .into_iter()
             .map(|s| s.parse::<u32>().context("Failed to parse input"))
             .collect()
     }
