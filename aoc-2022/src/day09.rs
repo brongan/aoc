@@ -81,6 +81,7 @@ fn pull(lead: &Point, follow: &mut Point, visited: &mut HashSet<Point>, update: 
         }
 
         if update {
+            eprintln!("The tail visited: {follow}");
             visited.insert(*follow);
         }
     }
@@ -109,6 +110,7 @@ fn follow_motions(mut rope: State, instructions: &[Motion]) -> usize {
     for instruction in instructions {
         follow_motion(instruction, &mut rope, &mut visited);
     }
+    eprintln!("Visited: {visited:?}");
     visited.len()
 }
 
@@ -134,6 +136,7 @@ impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2022<{ Day::Day9 }> {
 mod tests {
     use super::*;
     use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test_parsing() {}
@@ -149,6 +152,17 @@ D 1
 L 5
 R 2";
         let problem = super::AOC2022::<{ Day::Day9 }>;
-        problem.test_part1(input, 13)
+        problem.test_part1(input, 13)?;
+        problem.test_part2(input, 1)?;
+
+        let input2 = "R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20";
+        problem.test_part2(input2, 36)
     }
 }
