@@ -83,7 +83,6 @@ impl ForestView {
                 };
             }
         }
-        println!("Found visible tree from ({x}, {y}) in direction {direction:?} with distance: {distance}.");
         Visibility {
             visible: true,
             distance,
