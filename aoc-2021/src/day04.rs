@@ -86,7 +86,6 @@ impl FromStr for BingoGame {
         let first_line = lines.next().unwrap();
         let input: Vec<u32> = first_line
             .split(',')
-            .into_iter()
             .filter_map(|s| s.parse().ok())
             .collect();
         let lines: Vec<&str> = lines.filter(|l| !l.is_empty()).collect();
