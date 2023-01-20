@@ -14,7 +14,6 @@ impl ParseInput<'_, { Day::Day2 }> for AOC2021<{ Day::Day2 }> {
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         input
             .lines()
-            .into_iter()
             .map(|s| {
                 let mut words = s.split_whitespace().take(2);
                 Ok(Entry {
