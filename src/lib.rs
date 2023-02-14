@@ -5,11 +5,11 @@
 
 use anyhow::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use pretty_assertions::assert_eq;
+use pretty_assertions::{assert_eq, assert_str_eq};
+
 use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use thiserror::Error;
 
 pub mod point2d;
 
@@ -59,17 +59,6 @@ pub enum Day {
 pub enum Part {
     One,
     Two,
-}
-
-#[derive(Error, Debug)]
-pub enum AOCError {
-    #[error("Day: {day:?}, Part: {part:?} failed. Actual: {actual} Expected: {expected}")]
-    SolutionMismatch {
-        day: Day,
-        part: Part,
-        actual: String,
-        expected: String,
-    },
 }
 
 pub trait Solution<'a, const DAY: Day, const PART: Part> {
@@ -133,10 +122,24 @@ where
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
-    fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
+    default fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
         let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
         assert_eq!(output, expected);
+        Ok(())
+    }
+}
+
+impl<'a, T, const DAY: Day, U> PartOneVerifier<'a, DAY, U> for T
+where
+    T: ParseInput<'a, DAY>
+        + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
+    U: AsRef<str> + is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
+{
+    fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
+        let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
+        let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
+        assert_str_eq!(output, expected);
         Ok(())
     }
 }
@@ -147,10 +150,24 @@ where
         + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
     U: is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
 {
-    fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
+    default fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
         let input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
         assert_eq!(output, expected);
+        Ok(())
+    }
+}
+
+impl<'a, T, const DAY: Day, U> PartTwoVerifier<'a, DAY, U> for T
+where
+    T: ParseInput<'a, DAY>
+        + Solution<'a, DAY, { Part::Two }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
+    U: AsRef<str> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
+{
+    fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
+        let input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
+        let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
+        assert_str_eq!(output, expected);
         Ok(())
     }
 }
