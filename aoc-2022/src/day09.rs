@@ -135,9 +135,6 @@ mod tests {
     use aoc_runner::PartTwoVerifier;
 
     #[test]
-    fn test_parsing() {}
-
-    #[test]
     fn test() -> Result<()> {
         let input = "R 4
 U 4
