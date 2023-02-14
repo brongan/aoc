@@ -63,54 +63,50 @@ impl ParseInput<'_, { Day::Day9 }> for AOC2022<{ Day::Day9 }> {
     }
 }
 
-fn pull(lead: &Point, follow: &mut Point, visited: &mut HashSet<Point>, update: bool) {
-    loop {
-        let delta = *lead - *follow;
-
-        if delta.x.abs() <= 1 && delta.y.abs() <= 1 {
-            break;
-        }
-
-        if delta.x.abs() > 1 && delta.y == 0 {
-            follow.x += delta.x.signum();
-        } else if delta.y.abs() > 1 && delta.x == 0 {
-            follow.y += delta.y.signum();
-        } else {
-            follow.x += delta.x.signum();
-            follow.y += delta.y.signum();
-        }
-
-        if update {
-            eprintln!("The tail visited: {follow}");
-            visited.insert(*follow);
-        }
+fn step_tail(follow: &mut Point, delta: Point) {
+    if delta.x.abs() > 1 && delta.y == 0 {
+        follow.x += delta.x.signum();
+    } else if delta.y.abs() > 1 && delta.x == 0 {
+        follow.y += delta.y.signum();
+    } else {
+        follow.x += delta.x.signum();
+        follow.y += delta.y.signum();
     }
 }
 
-fn follow_motion(motion: &Motion, rope: &mut State, visited: &mut HashSet<Point>) {
-    let head = rope.first_mut().unwrap();
-    match motion.direction {
-        Direction::Up => head.y += motion.distance,
-        Direction::Down => head.y -= motion.distance,
-        Direction::Left => head.x -= motion.distance,
-        Direction::Right => head.x += motion.distance,
-    }
-
+fn eval_motion(motion: &Motion, rope: &mut State, visited: &mut HashSet<Point>) {
     let rope_len = rope.len();
-    for i in 1..rope_len {
-        let (left, right) = rope.split_at_mut(i);
-        let lead = left.last().unwrap();
-        let follow = right.first_mut().unwrap();
-        pull(lead, follow, visited, i + 1 == rope_len);
+    eprintln!("rope: {:?}", rope);
+    for _ in 0..motion.distance {
+        let head = rope.first_mut().unwrap();
+        match motion.direction {
+            Direction::Up => head.y += 1,
+            Direction::Down => head.y -= 1,
+            Direction::Left => head.x -= 1,
+            Direction::Right => head.x += 1,
+        }
+
+        for i in 1..rope_len {
+            let (left, right) = rope.split_at_mut(i);
+            let lead = left.last().unwrap();
+            let follow = right.first_mut().unwrap();
+            let delta = *lead - *follow;
+            if delta.x.abs() <= 1 && delta.y.abs() <= 1 {
+                continue;
+            }
+            step_tail(follow, delta);
+            if i == rope_len - 1 {
+                visited.insert(*follow);
+            }
+        }
     }
 }
 
-fn follow_motions(mut rope: State, instructions: &[Motion]) -> usize {
+fn eval_motions(mut rope: State, motions: &[Motion]) -> usize {
     let mut visited = HashSet::from([Point2D::new(0, 0)]);
-    for instruction in instructions {
-        follow_motion(instruction, &mut rope, &mut visited);
+    for motion in motions {
+        eval_motion(motion, &mut rope, &mut visited);
     }
-    eprintln!("Visited: {visited:?}");
     visited.len()
 }
 
@@ -119,7 +115,7 @@ impl Solution<'_, { Day::Day9 }, { Part::One }> for AOC2022<{ Day::Day9 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(follow_motions(vec![Point2D::new(0, 0); 2], input))
+        Ok(eval_motions(vec![Point2D::new(0, 0); 2], input))
     }
 }
 
@@ -128,7 +124,7 @@ impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2022<{ Day::Day9 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        Ok(follow_motions(vec![Point2D::new(0, 0); 10], input))
+        Ok(eval_motions(vec![Point2D::new(0, 0); 10], input))
     }
 }
 
