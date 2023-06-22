@@ -7,7 +7,7 @@ use anyhow::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use pretty_assertions::{assert_eq, assert_str_eq};
 
-use std::fmt::Display;
+use std::{fmt::Display, marker::ConstParamTy};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -25,6 +25,7 @@ pub mod point2d;
     Clone,
     Copy,
     Hash,
+    ConstParamTy,
 )]
 #[repr(u8)]
 pub enum Day {
@@ -55,7 +56,7 @@ pub enum Day {
     Day25,
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, ConstParamTy)]
 pub enum Part {
     One,
     Two,
@@ -134,7 +135,11 @@ impl<'a, T, const DAY: Day, U> PartOneVerifier<'a, DAY, U> for T
 where
     T: ParseInput<'a, DAY>
         + Solution<'a, DAY, { Part::One }, Input = <Self as ParseInput<'a, DAY>>::Parsed, Output = U>,
-    U: AsRef<str> + is_type::Is<Type = T::Output> + std::fmt::Debug + std::cmp::PartialEq + std::fmt::Display,
+    U: AsRef<str>
+        + is_type::Is<Type = T::Output>
+        + std::fmt::Debug
+        + std::cmp::PartialEq
+        + std::fmt::Display,
 {
     fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
         let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
