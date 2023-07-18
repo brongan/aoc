@@ -1,10 +1,7 @@
 use super::AOC2022;
+use anyhow::{anyhow, Result};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use counter::Counter;
-use std::{collections::VecDeque, str::FromStr};
-
-use anyhow::anyhow;
-use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_till, take_until},
@@ -14,6 +11,7 @@ use nom::{
     sequence::{delimited, pair, preceded, terminated, tuple},
     IResult,
 };
+use std::{collections::VecDeque, str::FromStr};
 
 #[derive(Clone, Debug, PartialEq)]
 enum Operand {
@@ -73,7 +71,7 @@ impl Operation {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Test {
+pub struct MonkeyTest {
     divisible_by: u64,
     truthy_index: usize,
     falsy_index: usize,
@@ -84,7 +82,7 @@ fn parse_line<'a, T: FromStr>(input: &'a str) -> IResult<&'a str, T> {
     map_res(digit1, |n: &str| n.parse::<T>())(input)
 }
 
-impl Test {
+impl MonkeyTest {
     fn parse(input: &str) -> IResult<&str, Self> {
         let (input, divisible_by) = parse_line(input)?;
         let (input, truthy_index) = parse_line(input)?;
@@ -92,7 +90,7 @@ impl Test {
 
         Ok((
             input,
-            Test {
+            MonkeyTest {
                 divisible_by,
                 truthy_index,
                 falsy_index,
@@ -115,7 +113,7 @@ fn parse_starting_items(input: &str) -> IResult<&str, VecDeque<u64>> {
 pub struct Monkey {
     items: VecDeque<u64>,
     operation: Operation,
-    test: Test,
+    monkey_test: MonkeyTest,
 }
 
 impl Monkey {
@@ -123,14 +121,14 @@ impl Monkey {
         let (input, _) = terminated(take_until("\n"), newline)(input)?;
         let (input, starting_items) = terminated(parse_starting_items, newline)(input)?;
         let (input, operation) = terminated(Operation::parse, newline)(input)?;
-        let (input, test) = terminated(Test::parse, newline)(input)?;
+        let (input, monkey_test) = terminated(MonkeyTest::parse, newline)(input)?;
 
         Ok((
             input,
             Monkey {
                 items: starting_items,
                 operation,
-                test,
+                monkey_test,
             },
         ))
     }
@@ -151,8 +149,8 @@ impl Monkey {
         }
     }
 
-    fn eval_test(&self, item: u64) -> bool {
-        item % self.test.divisible_by == 0
+    fn eval_monkey_test(&self, item: u64) -> bool {
+        item % self.monkey_test.divisible_by == 0
     }
 }
 
@@ -166,48 +164,52 @@ impl ParseInput<'_, { Day::Day11 }> for AOC2022<{ Day::Day11 }> {
     }
 }
 
-fn do_round<F>(input: &mut [Monkey], counter: &mut Counter<usize, usize>, worry_update: F)
+fn do_round<F>(
+    input: &mut [Monkey],
+    counter: &mut Counter<usize, usize>,
+    worry_update: F,
+) -> Result<()>
 where
     F: Fn(u64) -> u64,
 {
+    let num_monkeys = input.len();
     for i in 0..input.len() {
         counter[&i] += input[i].items.len();
-        for
-            loop {
-                if input[i].items.len() == 0 {
-                    break;
-                }
-
-                let item = input[i].items.pop_front().unwrap();
-                let item = input[i].inspect(item);
-                let item = worry_update(item);
-                if input[i].eval_test(item) {
-                    let j = input[i].test.truthy_index;
-                    input
-                        .get_mut(j)
-                        .ok_or_else(|| anyhow!("Not enough monkeys: j={}, #={}.", j, num_monkeys))?
-                        .items
-                        .push_back(item);
-                } else {
-                    let j = input[i].test.falsy_index;
-                    input
-                        .get_mut(j)
-                        .ok_or_else(|| anyhow!("Not enough monkeys: j={}, #={}.", j, num_monkeys))?
-                        .items
-                        .push_back(item);
-                }
+        loop {
+            if input[i].items.len() == 0 {
+                break;
             }
-    }
-}
 
+            let item = input[i].items.pop_front().unwrap();
+            let item = input[i].inspect(item);
+            let item = worry_update(item);
+            if input[i].eval_monkey_test(item) {
+                let j = input[i].monkey_test.truthy_index;
+                input
+                    .get_mut(j)
+                    .ok_or_else(|| anyhow!("Not enough monkeys: j={}, #={}.", j, num_monkeys))?
+                    .items
+                    .push_back(item);
+            } else {
+                let j = input[i].monkey_test.falsy_index;
+                input
+                    .get_mut(j)
+                    .ok_or_else(|| anyhow!("Not enough monkeys: j={}, #={}.", j, num_monkeys))?
+                    .items
+                    .push_back(item);
+            }
+        }
+    }
+    Ok(())
+}
 
 fn monkey_business<F>(mut input: Vec<Monkey>, num_rounds: usize, worry_update: F) -> Result<usize>
 where
     F: Fn(u64) -> u64,
 {
     let mut counter: Counter<usize, usize> = Counter::new();
-    let num_monkeys = input.len();
     for _round in 0..num_rounds {
+        do_round(&mut input, &mut counter, &worry_update)?;
     }
 
     Ok(counter
@@ -231,7 +233,10 @@ impl Solution<'_, { Day::Day11 }, { Part::Two }> for AOC2022<{ Day::Day11 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let divisor_product: u64 = input.iter().map(|m| m.test.divisible_by).product();
+        let divisor_product: u64 = input
+            .iter()
+            .map(|m: &Monkey| m.monkey_test.divisible_by)
+            .product();
         monkey_business(input.clone(), 1000, |i: u64| i % divisor_product)
     }
 }
@@ -273,10 +278,10 @@ mod tests {
     If true: throw to monkey 2
     If false: throw to monkey 3";
         assert_eq!(
-            Test::parse(test),
+            MonkeyTest::parse(test),
             Ok((
                 "",
-                Test {
+                MonkeyTest {
                     divisible_by: 23,
                     truthy_index: 2,
                     falsy_index: 3
