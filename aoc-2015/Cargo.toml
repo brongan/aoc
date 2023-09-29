@@ -4,11 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aoc-runner = { workspace = true }
-num_enum.workspace = true
-strum.workspace = true
-strum_macros.workspace = true
 anyhow.workspace = true
+aoc-runner = { workspace = true }
 counter.workspace = true
 itertools.workspace = true
 md5 = "0.7"
+nom.workspace = true
+num_enum.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
