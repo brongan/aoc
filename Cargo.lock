@@ -17,6 +17,7 @@ dependencies = [
  "counter",
  "itertools",
  "md5",
+ "nom",
  "num_enum",
  "strum",
  "strum_macros",
