@@ -29,13 +29,19 @@ where
     }
 }
 
-impl<T> Display for Point2D<T> where T: Display {
+impl<T> Display for Point2D<T>
+where
+    T: Display,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{})", self.x, self.y)
     }
 }
 
-impl<T> Debug for Point2D<T> where T: Debug {
+impl<T> Debug for Point2D<T>
+where
+    T: Debug,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "({:?},{:?})", self.x, self.y)
     }
