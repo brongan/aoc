@@ -144,7 +144,7 @@ where
     fn test_part1(&'a self, input: &'a str, expected: U) -> Result<()> {
         let parsed_input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed_input)?;
-        assert_str_eq!(output, expected);
+        assert_eq!(output, expected, "Expected: {expected} Actual: {output}",);
         Ok(())
     }
 }
@@ -158,7 +158,7 @@ where
     default fn test_part2(&'a self, input: &'a str, expected: U) -> Result<()> {
         let input = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let output = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &input)?;
-        assert_eq!(output, expected);
+        assert_eq!(output, expected, "Expected: {expected} Actual: {output}",);
         Ok(())
     }
 }
