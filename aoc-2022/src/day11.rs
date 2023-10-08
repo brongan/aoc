@@ -237,7 +237,7 @@ impl Solution<'_, { Day::Day11 }, { Part::Two }> for AOC2022<{ Day::Day11 }> {
             .iter()
             .map(|m: &Monkey| m.monkey_test.divisible_by)
             .product();
-        monkey_business(input.clone(), 1000, |i: u64| i % divisor_product)
+        monkey_business(input.clone(), 10000, |i: u64| i % divisor_product)
     }
 }
 
@@ -245,6 +245,7 @@ impl Solution<'_, { Day::Day11 }, { Part::Two }> for AOC2022<{ Day::Day11 }> {
 mod tests {
     use super::*;
     use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test_parsing() {
@@ -322,6 +323,7 @@ Monkey 3:
     If false: throw to monkey 1\n";
         let parsed = problem.parse_input(input)?;
         assert_eq!(parsed.len(), 4);
-        problem.test_part1(input, 10605)
+        problem.test_part1(input, 10605)?;
+        problem.test_part2(input, 2713310158)
     }
 }
