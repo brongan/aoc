@@ -1,83 +1,52 @@
-use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
+use std::collections::{HashMap, HashSet};
 
 use super::AOC2022;
 use aoc_runner::point2d::Point2D;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
-use anyhow::Context;
 use anyhow::Result;
 
 type Square = Point2D<usize>;
 
-struct HeightMap {
-    grid: Vec<Vec<u32>>,
+pub struct HeightMap {
+    grid: Vec<Vec<i32>>,
     start: Square,
     end: Square,
     width: usize,
     height: usize,
 }
 
-#[derive(Eq, PartialEq)]
-struct CloudNode {
-    pos: Square,
-    dist: u32,
-}
-
-impl Ord for CloudNode {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.dist.cmp(&self.dist)
-    }
-}
-
-impl PartialOrd for CloudNode {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 impl HeightMap {
-    fn all_nodes(&self) -> Vec<CloudNode> {
-        self.grid
-            .iter()
-            .enumerate(|(x, row)| {
-                row.iter().enumerate(|(y, h)| CloudNode {
-                    pos: Square { x, y },
-                    dist: u32::max_value(),
-                })
-            })
-            .collect()
+    fn height(&self, node: &Square) -> i32 {
+        if node.x >= self.width || node.y >= self.height {
+            panic!("{} is not a valid point.", node)
+        }
+        self.grid[node.y][node.x]
     }
 
-    fn height(&self, node: Square) -> u32 {
-        self.grid[node.x][node.y]
-    }
-
-    fn get_neighbors(&self, node: Square) -> Vec<Square> {
+    fn get_neighbors(&self, node: &Square) -> Vec<Square> {
         let mut result = Vec::new();
-        if node.x != 0 && node.y != 0 {
+        if node.x > 0 {
             result.push(Square {
                 x: node.x - 1,
+                y: node.y,
+            });
+        }
+        if node.y > 0 {
+            result.push(Square {
+                x: node.x,
                 y: node.y - 1,
             });
         }
-        if node.x != 0 && node.y != self.width {
-            result.push(Square {
-                x: node.x - 1,
-                y: node.y + 1,
-            });
-        }
-        if node.x != self.height && node.y != 0 {
+        if node.x <= self.height - 1 {
             result.push(Square {
                 x: node.x + 1,
-                y: node.y - 1,
+                y: node.y,
             });
         }
-        if node.x != self.height && node.y != self.width {
+        if node.y <= self.width - 1 {
             result.push(Square {
-                x: node.x + 1,
+                x: node.x,
                 y: node.y + 1,
             });
         }
@@ -89,24 +58,25 @@ impl ParseInput<'_, { Day::Day12 }> for AOC2022<{ Day::Day12 }> {
     type Parsed = HeightMap;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        eprintln!("{input}");
         let mut start = Square { x: 0, y: 0 };
         let mut end = start;
         let mut grid = Vec::new();
 
-        for (x, line) in input.lines().enumerate() {
+        for (y, line) in input.lines().enumerate() {
             let mut row = Vec::new();
-            for (y, c) in line.chars().enumerate() {
+            for (x, c) in line.chars().enumerate() {
                 match c {
                     'S' => {
                         start = Square { x, y };
-                        row.push(0);
+                        row.push(-1);
                     }
                     'E' => {
                         end = Square { x, y };
-                        row.push(25);
+                        row.push(26);
                     }
                     _ => {
-                        row.push(c as u32 - 'a' as u32);
+                        row.push(c as i32 - 'a' as i32);
                     }
                 }
             }
@@ -128,23 +98,35 @@ impl ParseInput<'_, { Day::Day12 }> for AOC2022<{ Day::Day12 }> {
 
 impl Solution<'_, { Day::Day12 }, { Part::One }> for AOC2022<{ Day::Day12 }> {
     type Input = HeightMap;
-    type Output = usize;
+    type Output = i32;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let mut distances = HashMap::from([(input.start, 0)]);
-        let mut cloud: Vec<CloudNode> = input.all_nodes();
-        distances[&input.start] = 0;
-
-        while !cloud.is_empty() {
-            let curr: CloudNode = std::cmp::min(cloud);
-            distances[curr.pos] = curr.dist;
-            for neighbor in input.get_neighbors(curr) {
-                if (input.height(curr) as i64 - input.height(neighbor) as i64).abs() <= 1 {
-                    t
-                }
+        let mut distances = HashMap::new();
+        let mut unvisited = HashSet::new();
+        for x in 0..input.width {
+            for y in 0..input.height {
+                distances.insert(Square { x, y }, i32::max_value());
+                unvisited.insert(Square { x, y });
             }
         }
-        Ok(distances[input.end])
+
+        distances.insert(input.start, 0);
+        let mut curr;
+        while unvisited.contains(&input.end) {
+            curr = *unvisited
+                .iter()
+                .min_by_key(|point| distances[point])
+                .unwrap();
+            for neighbor in &input.get_neighbors(&curr) {
+                eprintln!("Curr: {curr}, Neighbor: {neighbor}");
+                let diff = input.height(&curr) - input.height(neighbor);
+                if diff.abs() <= 1 {
+                    distances.insert(neighbor.clone(), distances[&curr] + 1);
+                }
+            }
+            unvisited.remove(&curr);
+        }
+        Ok(distances[&input.end])
     }
 }
 
