@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use super::AOC2022;
 use aoc_runner::point2d::Point2D;
@@ -38,19 +38,39 @@ impl HeightMap {
                 y: node.y - 1,
             });
         }
-        if node.x <= self.height - 1 {
+        if node.x < self.width - 1 {
             result.push(Square {
                 x: node.x + 1,
                 y: node.y,
             });
         }
-        if node.y <= self.width - 1 {
+        if node.y < self.height - 1 {
             result.push(Square {
                 x: node.x,
                 y: node.y + 1,
             });
         }
         result
+            .into_iter()
+            .filter(|neighbor| self.height(neighbor) - self.height(&node) <= 1)
+            .collect()
+    }
+
+    fn djikstra(&self, start: &Square) -> HashMap<Square, i32> {
+        let mut distances = HashMap::new();
+        let mut cloud = HashMap::from([(*start, 0)]);
+        while !cloud.is_empty() {
+            let next = cloud.iter().min_by_key(|entry| entry.1).unwrap();
+            let (curr, dist) = (*next.0, *next.1);
+            distances.insert(curr, dist);
+            for neighbor in &self.get_neighbors(&curr) {
+                if !distances.contains_key(neighbor) && !cloud.contains_key(neighbor) {
+                    cloud.insert(neighbor.clone(), distances[&curr] + 1);
+                }
+            }
+            cloud.remove(&curr);
+        }
+        distances
     }
 }
 
@@ -58,7 +78,6 @@ impl ParseInput<'_, { Day::Day12 }> for AOC2022<{ Day::Day12 }> {
     type Parsed = HeightMap;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        eprintln!("{input}");
         let mut start = Square { x: 0, y: 0 };
         let mut end = start;
         let mut grid = Vec::new();
@@ -83,8 +102,8 @@ impl ParseInput<'_, { Day::Day12 }> for AOC2022<{ Day::Day12 }> {
             grid.push(row);
         }
 
-        let width = grid.len();
-        let height = grid[0].len();
+        let height = grid.len();
+        let width = grid[0].len();
 
         Ok(HeightMap {
             grid,
@@ -101,32 +120,37 @@ impl Solution<'_, { Day::Day12 }, { Part::One }> for AOC2022<{ Day::Day12 }> {
     type Output = i32;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let mut distances = HashMap::new();
-        let mut unvisited = HashSet::new();
-        for x in 0..input.width {
-            for y in 0..input.height {
-                distances.insert(Square { x, y }, i32::max_value());
-                unvisited.insert(Square { x, y });
-            }
-        }
+        let distances = input.djikstra(&input.start);
+        Ok(distances[&input.end])
+    }
+}
 
-        distances.insert(input.start, 0);
-        let mut curr;
-        while unvisited.contains(&input.end) {
-            curr = *unvisited
-                .iter()
-                .min_by_key(|point| distances[point])
-                .unwrap();
-            for neighbor in &input.get_neighbors(&curr) {
-                eprintln!("Curr: {curr}, Neighbor: {neighbor}");
-                let diff = input.height(&curr) - input.height(neighbor);
-                if diff.abs() <= 1 {
-                    distances.insert(neighbor.clone(), distances[&curr] + 1);
+impl Solution<'_, { Day::Day12 }, { Part::Two }> for AOC2022<{ Day::Day12 }> {
+    type Input = HeightMap;
+    type Output = i32;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        let mut starts: Vec<Square> = Vec::new();
+        for (y, row) in input.grid.iter().enumerate() {
+            for (x, height) in row.iter().enumerate() {
+                if *height == 0 {
+                    starts.push(Square { x, y });
                 }
             }
-            unvisited.remove(&curr);
         }
-        Ok(distances[&input.end])
+        let result = starts
+            .iter()
+            .map(|start| {
+                let distances = input.djikstra(&start);
+                match distances.get(&input.end) {
+                    Some(x) => Some(*x),
+                    None => None,
+                }
+            })
+            .flatten()
+            .min()
+            .unwrap();
+        Ok(result)
     }
 }
 
