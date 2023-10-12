@@ -1,17 +1,16 @@
-use std::cmp::Ordering;
-
 use super::AOC2022;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use nom::{
     branch::alt,
     bytes::complete::tag,
     character::complete::{digit1, newline},
-    combinator::{all_consuming, map, map_res},
+    combinator::{map, map_res},
     multi::{count, separated_list0, separated_list1},
     sequence::{delimited, separated_pair},
     IResult,
 };
+use std::cmp::Ordering;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Packet {
@@ -49,14 +48,14 @@ impl Ord for Packet {
         match (self, other) {
             (Packet::Value(l), Packet::Value(r)) => l.cmp(r),
             (Packet::List(l), Packet::List(r)) => compare_lists(l, r),
-            (Packet::Value(l), Packet::List(r)) => {
-                let l = Packet::List(Vec::from([Packet::Value(*l)]));
+            (l, Packet::List(r)) => {
+                let l = Packet::List(Vec::from([l.clone()]));
                 let r = Packet::List(r.clone());
                 l.cmp(&r)
             }
-            (Packet::List(l), Packet::Value(r)) => {
+            (Packet::List(l), r) => {
                 let l = Packet::List(l.clone());
-                let r = Packet::List(Vec::from([Packet::Value(*r)]));
+                let r = Packet::List(Vec::from([r.clone()]));
                 l.cmp(&r)
             }
         }
@@ -97,6 +96,7 @@ impl ParseInput<'_, { Day::Day13 }> for AOC2022<{ Day::Day13 }> {
         Ok(packet_pairs)
     }
 }
+
 impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2022<{ Day::Day13 }> {
     type Input = Vec<PacketPair>;
     type Output = usize;
@@ -106,14 +106,43 @@ impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2022<{ Day::Day13 }> {
             .iter()
             .enumerate()
             .filter(|(_, pair)| pair.ordered())
-            .map(|(i, _)| i)
+            .map(|(i, _)| i + 1)
             .sum())
+    }
+}
+
+impl Solution<'_, { Day::Day13 }, { Part::Two }> for AOC2022<{ Day::Day13 }> {
+    type Input = Vec<PacketPair>;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        let mut packets: Vec<Packet> = input
+            .iter()
+            .flat_map(|PacketPair(l, r)| [l.clone(), r.clone()])
+            .collect();
+        let divider1 = Packet::List(Vec::from([Packet::List(Vec::from([Packet::Value(2)]))]));
+        let divider2 = Packet::List(Vec::from([Packet::List(Vec::from([Packet::Value(6)]))]));
+        packets.push(divider1.clone());
+        packets.push(divider2.clone());
+        packets.sort();
+        let index1 = packets
+            .iter()
+            .position(|packet| *packet == divider1)
+            .context("Failed to find divider1.")?
+            + 1;
+        let index2 = packets
+            .iter()
+            .position(|packet| *packet == divider2)
+            .context("Failed to find divider2")?
+            + 1;
+        Ok(index1 * index2)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use aoc_runner::PartOneVerifier;
 
     #[test]
     fn test_parse_packet() -> Result<()> {
@@ -156,33 +185,88 @@ mod tests {
     }
 
     #[test]
+    fn test_compare() -> Result<()> {
+        // [1,1,3,1,1]\n[1,1,5,1,1]
+        let pair = PacketPair(
+            Packet::List(
+                [
+                    Packet::Value(1),
+                    Packet::Value(1),
+                    Packet::Value(3),
+                    Packet::Value(1),
+                    Packet::Value(1),
+                ]
+                .to_vec(),
+            ),
+            Packet::List(
+                [
+                    Packet::Value(1),
+                    Packet::Value(1),
+                    Packet::Value(5),
+                    Packet::Value(1),
+                    Packet::Value(1),
+                ]
+                .to_vec(),
+            ),
+        );
+        assert!(pair.ordered());
+        Ok(())
+    }
+
+    #[test]
+    fn test_ordered() -> Result<()> {
+        let (_, parsed) = PacketPair::parse("[[1],[2,3,4]]\n[[1],4]")?;
+        assert!(parsed.ordered());
+
+        let (_, parsed) = PacketPair::parse("[9]\n[[8,7,6]]")?;
+        assert!(!parsed.ordered());
+
+        let (_, parsed) = PacketPair::parse("[[4,4],4,4]\n[[4,4],4,4,4]")?;
+        assert!(parsed.ordered());
+
+        let (_, parsed) = PacketPair::parse("[7,7,7,7]\n[7,7,7]")?;
+        assert!(!parsed.ordered());
+
+        let (_, parsed) = PacketPair::parse("[]\n[3]")?;
+        assert!(parsed.ordered());
+
+        let (_, parsed) = PacketPair::parse("[[[]]]\n[[]]")?;
+        assert!(!parsed.ordered());
+
+        let (remainder, parsed) =
+            PacketPair::parse("[1,[2,[3,[4,[5,6,7]]]],8,9]\n[1,[2,[3,[4,[5,6,0]]]],8,9]")?;
+        assert_eq!(remainder, "");
+        assert!(!parsed.ordered());
+
+        Ok(())
+    }
+
+    #[test]
     fn test() -> Result<()> {
         let problem = super::AOC2022::<{ Day::Day13 }>;
-        /*
-                let input = "[1,1,3,1,1]
-        [1,1,5,1,1]
+        let input = "[1,1,3,1,1]
+[1,1,5,1,1]
 
-        [[1],[2,3,4]]
-        [[1],4]
+[[1],[2,3,4]]
+[[1],4]
 
-        [9]
-        [[8,7,6]]
+[9]
+[[8,7,6]]
 
-        [[4,4],4,4]
-        [[4,4],4,4,4]
+[[4,4],4,4]
+[[4,4],4,4,4]
 
-        [7,7,7,7]
-        [7,7,7]
+[7,7,7,7]
+[7,7,7]
 
-        []
-        [3]
+[]
+[3]
 
-        [[[]]]
-        [[]]
+[[[]]]
+[[]]
 
-        [1,[2,[3,[4,[5,6,7]]]],8,9]
-        [1,[2,[3,[4,[5,6,0]]]],8,9]";
-                let _ = problem.parse_input(input)?;*/
-        Ok(())
+[1,[2,[3,[4,[5,6,7]]]],8,9]
+[1,[2,[3,[4,[5,6,0]]]],8,9]";
+        problem.test_part1(input, 13)
     }
 }
