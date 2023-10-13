@@ -70,7 +70,67 @@ fn create_world(input: &[Line]) -> HashMap<Point2D<usize>, Unit> {
     world
 }
 
+fn num_sand_fit(world: &mut HashMap<Point2D<usize>, Unit>) -> Result<u64> {
+    let max_y = *world
+        .keys()
+        .map(|Point2D { x: _x, y }| y)
+        .max()
+        .context("No rocks.")?;
+    let mut num_sand = 0;
+    loop {
+        let mut curr = Point2D { x: 500, y: 0 };
+        num_sand += 1;
+        loop {
+            if curr.y >= max_y {
+                return Ok(num_sand - 1);
+            }
+
+            let down = Point2D {
+                x: curr.x,
+                y: curr.y + 1,
+            };
+            let left = Point2D {
+                x: curr.x - 1,
+                y: curr.y + 1,
+            };
+            let right = Point2D {
+                x: curr.x + 1,
+                y: curr.y + 1,
+            };
+            curr = if world.get(&down).unwrap_or(&Unit::Air) == &Unit::Air {
+                world.insert(curr, Unit::Air);
+                down
+            } else if world.get(&left).unwrap_or(&Unit::Air) == &Unit::Air {
+                world.insert(curr, Unit::Air);
+                left
+            } else if world.get(&right).unwrap_or(&Unit::Air) == &Unit::Air {
+                world.insert(curr, Unit::Air);
+                right
+            } else {
+                match world.insert(curr, Unit::Sand) {
+                    Some(unit) => match unit {
+                        Unit::Air => (),
+                        Unit::Rock | Unit::Sand => return Ok(num_sand - 1),
+                    },
+                    _ => (),
+                }
+                break;
+            };
+        }
+    }
+}
+
 impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2022<{ Day::Day14 }> {
+    type Input = Vec<Line>;
+    type Output = u64;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        let mut world = create_world(&input);
+        num_sand_fit(&mut world)
+    }
+}
+
+impl Solution<'_, { Day::Day14 }, { Part::Two }> for AOC2022<{ Day::Day14 }> {
     type Input = Vec<Line>;
     type Output = u64;
 
@@ -81,43 +141,12 @@ impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2022<{ Day::Day14 }> {
             .map(|Point2D { x: _x, y }| y)
             .max()
             .context("No rocks.")?;
-        let mut num_sand = 0;
-        loop {
-            let mut curr = Point2D { x: 500, y: 0 };
-            num_sand += 1;
-            loop {
-                if curr.y >= max_y {
-                    return Ok(num_sand - 1);
-                }
 
-                println!("{curr}");
-                let down = Point2D {
-                    x: curr.x,
-                    y: curr.y + 1,
-                };
-                let left = Point2D {
-                    x: curr.x - 1,
-                    y: curr.y + 1,
-                };
-                let right = Point2D {
-                    x: curr.x + 1,
-                    y: curr.y + 1,
-                };
-                curr = if world.get(&down).unwrap_or(&Unit::Air) == &Unit::Air {
-                    world.insert(curr, Unit::Air);
-                    down
-                } else if world.get(&left).unwrap_or(&Unit::Air) == &Unit::Air {
-                    world.insert(curr, Unit::Air);
-                    left
-                } else if world.get(&right).unwrap_or(&Unit::Air) == &Unit::Air {
-                    world.insert(curr, Unit::Air);
-                    right
-                } else {
-                    world.insert(curr, Unit::Sand);
-                    break;
-                };
-            }
+        for x in 0..1000 {
+            world.insert(Point2D { x, y: max_y + 2 }, Unit::Rock);
         }
+
+        num_sand_fit(&mut world)
     }
 }
 
@@ -125,6 +154,7 @@ impl Solution<'_, { Day::Day14 }, { Part::One }> for AOC2022<{ Day::Day14 }> {
 mod tests {
     use super::*;
     use aoc_runner::PartOneVerifier;
+    use aoc_runner::PartTwoVerifier;
 
     #[test]
     fn test_parse_line() -> Result<()> {
@@ -165,6 +195,7 @@ mod tests {
             ])
         );
         problem.test_part1(&input, 24)?;
+        problem.test_part2(&input, 93)?;
         Ok(())
     }
 }
