@@ -1,3 +1,8 @@
+use nom::bytes::complete::tag;
+use nom::character::complete::digit1;
+use nom::combinator::recognize;
+use nom::sequence::separated_pair;
+use nom::IResult;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, Sub};
 use std::str::FromStr;
@@ -12,6 +17,10 @@ impl<T> Point2D<T> {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
+}
+
+pub fn recognize_point2d(input: &str) -> IResult<&str, &str> {
+    recognize(separated_pair(digit1, tag(","), digit1))(input)
 }
 
 impl<T> FromStr for Point2D<T>
@@ -70,5 +79,16 @@ where
             x: self.x - rhs.x,
             y: self.y - rhs.y,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_recognize() {
+        assert_eq!(recognize_point2d("123,456\n "), Ok(("\n ", "123,456")));
+        assert!(recognize_point2d("a,b").is_err());
     }
 }
