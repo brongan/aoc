@@ -75,7 +75,7 @@ impl ParseInput<'_, { Day::Day13 }> for AOC2021<{ Day::Day13 }> {
 }
 
 fn fold(points: &mut Points, instruction: &FoldInstruction) {
-    for mut point in points {
+    for point in points {
         match *instruction {
             FoldInstruction::X(x) => {
                 if point.x > x {
