@@ -38,7 +38,7 @@ pub struct BingoGame {
 }
 
 fn pull(board: &mut BingoBoard, num: u32) -> bool {
-    for mut elem in board.iter_mut().flatten() {
+    for elem in board.iter_mut().flatten() {
         if elem.value == num {
             elem.is_set = true;
             return true;
