@@ -3,6 +3,8 @@ use nom::character::complete::digit1;
 use nom::combinator::recognize;
 use nom::sequence::separated_pair;
 use nom::IResult;
+use num::Signed;
+use std::cmp::{max, min};
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, Sub};
 use std::str::FromStr;
@@ -17,6 +19,13 @@ impl<T> Point2D<T> {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
+}
+
+pub fn manhattan_distance<T>(l: &Point2D<T>, r: &Point2D<T>) -> T
+where
+    T: Signed + std::cmp::Ord + Copy,
+{
+    max(l.x, r.x).abs_sub(&min(l.x, r.x)) + max(l.y, r.y).abs_sub(&min(l.y, r.y))
 }
 
 pub fn recognize_point2d(input: &str) -> IResult<&str, &str> {
