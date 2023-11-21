@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use super::AOC2022;
 use anyhow::{Context, Result};
 use aoc_runner::point2d::{manhattan_distance, Point2D};
@@ -12,6 +10,7 @@ use nom::{
     sequence::{preceded, separated_pair, terminated},
     IResult,
 };
+use std::collections::HashMap;
 
 #[derive(PartialEq, Debug)]
 pub struct LogLine {
@@ -53,40 +52,79 @@ impl ParseInput<'_, { Day::Day15 }> for AOC2022<{ Day::Day15 }> {
     }
 }
 
-fn pos_can_contain_beacon(
-    pos: &Point2D<i64>,
-    sensor: &Point2D<i64>,
-    beacon: &Point2D<i64>,
-) -> bool {
-    manhattan_distance(sensor, pos) > manhattan_distance(sensor, beacon)
+fn mark_cannot(line: &LogLine, cannot_contain: &mut HashMap<Point2D<i64>, char>) {
+    let dist = manhattan_distance(&line.sensor, &line.closest_beacon);
+    for x in -dist..dist + 1 {
+        let y_diff = dist - x.abs();
+        for y in -y_diff..y_diff + 1 {
+            let point = Point2D {
+                x: line.sensor.x + x,
+                y: line.sensor.y + y,
+            };
+            if !cannot_contain.contains_key(&point) {
+                cannot_contain.insert(point, '#');
+            }
+        }
+    }
+}
+
+fn print_world(world: &HashMap<Point2D<i64>, char>) -> Result<()> {
+    let min_x = world
+        .keys()
+        .map(|v| v.x)
+        .min()
+        .context("Failed to find x values.")?;
+    let max_x = world
+        .keys()
+        .map(|v| v.x)
+        .max()
+        .context("Failed to find x values.")?;
+    let min_y = world
+        .keys()
+        .map(|v| v.y)
+        .min()
+        .context("Failed to find y values.")?;
+    let max_y = world
+        .keys()
+        .map(|v| v.y)
+        .max()
+        .context("Failed to find y values.")?;
+
+    for y in min_y..max_y + 1 {
+        eprint!("{y:3} ");
+        for x in min_x..max_x + 1 {
+            let val = world.get(&Point2D { x, y }).unwrap_or(&'.');
+            eprint!("{val}");
+        }
+        eprint!("\n");
+    }
+
+    Ok(())
 }
 
 fn cannot_contain_beacon_count(input: &[LogLine], y: i64) -> Result<usize> {
-    let x_values: Vec<i64> = input
-        .iter()
-        .map(|line| [line.sensor.x, line.closest_beacon.x])
-        .flatten()
-        .collect();
-    let min_x = x_values.iter().min().context("Failed to find x values.")?;
-    let max_x = x_values.iter().max().context("Failed to find x values.")?;
-    let beacon_locations: HashSet<Point2D<i64>> =
-        input.iter().map(|line| line.closest_beacon).collect();
+    let mut cannot_contain = HashMap::new();
+    for line in input {
+        cannot_contain.insert(line.closest_beacon, 'B');
+        cannot_contain.insert(line.sensor, 'S');
+    }
+    for line in input {
+        mark_cannot(line, &mut cannot_contain);
+    }
+    let min_x = cannot_contain
+        .keys()
+        .map(|v| v.x)
+        .min()
+        .context("Failed to find x values.")?;
+    let max_x = cannot_contain
+        .keys()
+        .map(|v| v.x)
+        .max()
+        .context("Failed to find x values.")?;
 
-    let beacon_possible = |pos: Point2D<i64>| {
-        if beacon_locations.contains(&pos) {
-            return true;
-        }
-        for line in input {
-            if !pos_can_contain_beacon(&pos, &line.sensor, &line.closest_beacon) {
-                return false;
-            }
-        }
-        true
-    };
-
-    Ok((*min_x - 1_000_000..max_x + 1_000_000)
-        .map(|x| !beacon_possible(Point2D { x, y }))
-        .filter(|x| *x)
+    Ok((min_x..max_x + 1)
+        .map(|x| cannot_contain.get(&Point2D { x, y }).unwrap_or(&'.'))
+        .filter(|x| **x != '.' && **x != 'B')
         .count())
 }
 
