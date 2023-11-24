@@ -1,5 +1,5 @@
 use super::AOC2022;
-use anyhow::{Context, Result};
+use anyhow::Result;
 use aoc_runner::point2d::{manhattan_distance, Point2D};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use nom::{
@@ -10,12 +10,12 @@ use nom::{
     sequence::{preceded, separated_pair, terminated},
     IResult,
 };
-use std::collections::HashMap;
+use std::cmp::{max, min};
 
 #[derive(PartialEq, Debug)]
 pub struct LogLine {
     sensor: Point2D<i64>,
-    closest_beacon: Point2D<i64>,
+    beacon: Point2D<i64>,
 }
 
 fn parse_point(input: &str) -> IResult<&str, Point2D<i64>> {
@@ -33,10 +33,7 @@ impl LogLine {
         let parse_beacon = |input| preceded(tag("closest beacon is at "), parse_point)(input);
         map(
             separated_pair(parse_sensor, tag(": "), parse_beacon),
-            |(sensor, beacon)| LogLine {
-                sensor,
-                closest_beacon: beacon,
-            },
+            |(sensor, beacon)| LogLine { sensor, beacon },
         )(input)
     }
 }
@@ -52,79 +49,51 @@ impl ParseInput<'_, { Day::Day15 }> for AOC2022<{ Day::Day15 }> {
     }
 }
 
-fn mark_cannot(line: &LogLine, cannot_contain: &mut HashMap<Point2D<i64>, char>) {
-    let dist = manhattan_distance(&line.sensor, &line.closest_beacon);
-    for x in -dist..dist + 1 {
-        let y_diff = dist - x.abs();
-        for y in -y_diff..y_diff + 1 {
-            let point = Point2D {
-                x: line.sensor.x + x,
-                y: line.sensor.y + y,
-            };
-            if !cannot_contain.contains_key(&point) {
-                cannot_contain.insert(point, '#');
-            }
-        }
+fn get_boundaries(input: &[LogLine]) -> (i64, i64, i64, i64) {
+    let mut min_x = 0;
+    let mut max_x = 0;
+    let mut min_y = 0;
+    let mut max_y = 0;
+
+    for line in input {
+        let dist = manhattan_distance(&line.sensor, &line.beacon);
+        min_x = min(min_x, min(line.beacon.x - dist, line.sensor.x - dist));
+        max_x = max(max_x, max(line.beacon.x + dist, line.sensor.x + dist));
+        min_y = min(min_y, min(line.beacon.y - dist, line.sensor.y - dist));
+        max_y = max(max_y, max(line.beacon.y + dist, line.sensor.y + dist));
     }
+    (min_x, max_x, min_y, max_y)
 }
 
-fn print_world(world: &HashMap<Point2D<i64>, char>) -> Result<()> {
-    let min_x = world
-        .keys()
-        .map(|v| v.x)
-        .min()
-        .context("Failed to find x values.")?;
-    let max_x = world
-        .keys()
-        .map(|v| v.x)
-        .max()
-        .context("Failed to find x values.")?;
-    let min_y = world
-        .keys()
-        .map(|v| v.y)
-        .min()
-        .context("Failed to find y values.")?;
-    let max_y = world
-        .keys()
-        .map(|v| v.y)
-        .max()
-        .context("Failed to find y values.")?;
+#[derive(PartialEq)]
+enum State {
+    Beacon,
+    Pound,
+    Dot,
+}
 
-    for y in min_y..max_y + 1 {
-        eprint!("{y:3} ");
-        for x in min_x..max_x + 1 {
-            let val = world.get(&Point2D { x, y }).unwrap_or(&'.');
-            eprint!("{val}");
+fn cannot_contain_beacon(point: &Point2D<i64>, input: &[LogLine]) -> State {
+    for line in input {
+        if *point == line.beacon {
+            return State::Beacon;
         }
-        eprint!("\n");
     }
-
-    Ok(())
+    for line in input {
+        if manhattan_distance(&point, &line.sensor)
+            <= manhattan_distance(&line.beacon, &line.sensor)
+        {
+            return State::Pound;
+        }
+    }
+    State::Dot
 }
 
 fn cannot_contain_beacon_count(input: &[LogLine], y: i64) -> Result<usize> {
-    let mut cannot_contain = HashMap::new();
-    for line in input {
-        cannot_contain.insert(line.closest_beacon, 'B');
-        cannot_contain.insert(line.sensor, 'S');
-    }
-    for line in input {
-        mark_cannot(line, &mut cannot_contain);
-    }
-    let min_x = cannot_contain
-        .keys()
-        .map(|v| v.x)
-        .min()
-        .context("Failed to find x values.")?;
-    let max_x = cannot_contain
-        .keys()
-        .map(|v| v.x)
-        .max()
-        .context("Failed to find x values.")?;
+    let (min_x, max_x, _min_y, _max_y) = get_boundaries(&input);
 
     Ok((min_x..max_x + 1)
-        .map(|x| cannot_contain.get(&Point2D { x, y }).unwrap_or(&'.'))
-        .filter(|x| **x != '.' && **x != 'B')
+        .map(|x| cannot_contain_beacon(&Point2D { x, y }, &input))
+        .filter(|x| *x == State::Pound)
         .count())
 }
 
@@ -154,7 +123,7 @@ mod tests {
                         x: 2832148,
                         y: 322979
                     },
-                    closest_beacon: Point2D {
+                    beacon: Point2D {
                         x: 3015667,
                         y: -141020
                     }
