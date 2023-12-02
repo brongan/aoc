@@ -57,6 +57,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "aoc-2023"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-runner",
+ "counter",
+ "itertools",
+ "nom",
+ "num_enum",
+ "pretty_assertions",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "aoc-runner"
 version = "0.1.0"
 dependencies = [
