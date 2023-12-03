@@ -1,7 +1,6 @@
 use super::AOC2023;
-use aoc_runner::{Day, ParseInput, Part, Solution};
-
 use anyhow::{Context, Result};
+use aoc_runner::{Day, ParseInput, Part, Solution};
 use nom::{
     branch::alt,
     bytes::complete::{tag, take},
