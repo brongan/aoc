@@ -1,5 +1,5 @@
 use super::AOC2022;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use aoc_runner::point2d::{manhattan_distance, Point2D};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use nom::{
@@ -12,18 +12,20 @@ use nom::{
 };
 use std::cmp::{max, min};
 
+type Point = Point2D<i64>;
+
 #[derive(PartialEq, Debug)]
 pub struct LogLine {
-    sensor: Point2D<i64>,
-    beacon: Point2D<i64>,
+    sensor: Point,
+    beacon: Point,
 }
 
-fn parse_point(input: &str) -> IResult<&str, Point2D<i64>> {
+fn parse_point(input: &str) -> IResult<&str, Point> {
     let parse_x = |input| preceded(tag("x="), nom::character::complete::i64)(input);
     let parse_y = |input| preceded(tag("y="), nom::character::complete::i64)(input);
     Ok(map(
         separated_pair(parse_x, tag(", "), parse_y),
-        |(x, y)| Point2D { x, y },
+        |(x, y)| Point { x, y },
     )(input)?)
 }
 
@@ -72,7 +74,7 @@ enum State {
     Dot,
 }
 
-fn cannot_contain_beacon(point: &Point2D<i64>, input: &[LogLine]) -> State {
+fn beacon_possibility(point: &Point, input: &[LogLine]) -> State {
     for line in input {
         if *point == line.beacon {
             return State::Beacon;
@@ -92,7 +94,7 @@ fn cannot_contain_beacon_count(input: &[LogLine], y: i64) -> Result<usize> {
     let (min_x, max_x, _min_y, _max_y) = get_boundaries(&input);
 
     Ok((min_x..max_x + 1)
-        .map(|x| cannot_contain_beacon(&Point2D { x, y }, &input))
+        .map(|x| beacon_possibility(&Point { x, y }, &input))
         .filter(|x| *x == State::Pound)
         .count())
 }
@@ -103,6 +105,53 @@ impl Solution<'_, { Day::Day15 }, { Part::One }> for AOC2022<{ Day::Day15 }> {
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         cannot_contain_beacon_count(&input, 2_000_000)
+    }
+}
+
+fn tuning_frequency(point: &Point) -> i64 {
+    point.x * 4000000 + point.y
+}
+
+fn can_contain_brute(input: &[LogLine], bottom_right: &Point) -> Option<Point> {
+    for x in 0..bottom_right.x {
+        for y in 0..bottom_right.y {
+            let point = Point { x, y };
+            if beacon_possibility(&point, input) == State::Dot {
+                return Some(point);
+            }
+        }
+    }
+    None
+}
+
+struct Interval {
+    start: i64,
+    end: i64,
+}
+
+fn can_contain(input: &[LogLine], bottom_right: &Point) -> Option<Point> {
+    // for each edge line, consider the parallel edge line with 1 away
+    //
+}
+
+fn find_frequency(input: &[LogLine], bottom_right: &Point) -> Result<i64> {
+    can_contain_brute(input, &bottom_right)
+        .map(|p| tuning_frequency(&p))
+        .context("Did not find point.")
+}
+
+impl Solution<'_, { Day::Day15 }, { Part::Two }> for AOC2022<{ Day::Day15 }> {
+    type Input = Vec<LogLine>;
+    type Output = i64;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        find_frequency(
+            input,
+            &Point {
+                x: 4000000,
+                y: 4000000,
+            },
+        )
     }
 }
 
@@ -119,11 +168,11 @@ mod tests {
             (
                 "",
                 LogLine {
-                    sensor: Point2D {
+                    sensor: Point {
                         x: 2832148,
                         y: 322979
                     },
-                    beacon: Point2D {
+                    beacon: Point {
                         x: 3015667,
                         y: -141020
                     }
@@ -152,6 +201,11 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3";
         let problem = super::AOC2022::<{ Day::Day15 }>;
         let parsed = problem.parse_input(input)?;
         assert_eq!(cannot_contain_beacon_count(&parsed, 10)?, 26);
+        assert_eq!(
+            can_contain_brute(&parsed, &Point { x: 20, y: 20 }),
+            Some(Point { x: 14, y: 11 })
+        );
+        assert_eq!(find_frequency(&parsed, &Point { x: 20, y: 20 })?, 56000011);
         Ok(())
     }
 }
