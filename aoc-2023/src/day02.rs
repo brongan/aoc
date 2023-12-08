@@ -3,7 +3,7 @@ use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_while1},
+    bytes::complete::tag,
     character::complete::{digit1, space1},
     combinator::{all_consuming, map, map_res, recognize},
     multi::{many1, separated_list1},
