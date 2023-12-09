@@ -12,6 +12,7 @@ anyhow.workspace = true
 counter.workspace = true
 itertools.workspace = true
 nom.workspace = true
+rayon.workspace = true
 
 [dev-dependencies]
 pretty_assertions.workspace = true
