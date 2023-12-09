@@ -4,6 +4,8 @@
 #![feature(specialization)]
 
 mod day01;
+mod day02;
+mod day03;
 mod day04;
 mod day05;
 
@@ -27,6 +29,8 @@ fn solve(day: &Day) -> Result<()> {
     let input = input(day)?;
     match day {
         Day::Day1 => AOC2023::<{ Day::Day1 }>.run(&input),
+        Day::Day2 => AOC2023::<{ Day::Day2 }>.run(&input),
+        Day::Day3 => AOC2023::<{ Day::Day3 }>.run(&input),
         Day::Day4 => AOC2023::<{ Day::Day4 }>.run(&input),
         Day::Day5 => AOC2023::<{ Day::Day5 }>.run(&input),
         _ => Err(anyhow!("Day not implemented yet")),
