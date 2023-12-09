@@ -96,8 +96,8 @@ where
     fn run(&'a self, input: &'a str) -> Result<()> {
         let parsed = <Self as ParseInput<DAY>>::parse_input(self, input)?;
         let part1 = <Self as Solution<'a, DAY, { Part::One }>>::solve(self, &parsed)?;
-        let part2 = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed)?;
         println!("Part One: {part1}");
+        let part2 = <Self as Solution<'a, DAY, { Part::Two }>>::solve(self, &parsed)?;
         println!("Part Two: {part2}");
         Ok(())
     }
