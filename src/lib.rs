@@ -56,7 +56,7 @@ pub enum Day {
     Day25,
 }
 
-#[derive(PartialEq, Eq, Debug, ConstParamTy)]
+#[derive(PartialEq, Eq, Debug, ConstParamTy, Clone)]
 pub enum Part {
     One,
     Two,
