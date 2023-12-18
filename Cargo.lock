@@ -65,6 +65,7 @@ dependencies = [
  "counter",
  "itertools",
  "nom",
+ "num",
  "num_enum",
  "pretty_assertions",
  "rayon",
