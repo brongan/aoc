@@ -1,6 +1,8 @@
 use super::AOC2023;
 use anyhow::{anyhow, Context, Result};
 use aoc_runner::{point2d::Point2D, Day, ParseInput, Part, Solution};
+use colored::Colorize;
+use std::collections::HashSet;
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
@@ -33,15 +35,19 @@ fn to_tile(c: char) -> Result<Tile> {
 type Map = Vec<Vec<Tile>>;
 type Coord = Point2D<i32>;
 
+fn parse_map(input: &str) -> Result<Map> {
+    input
+        .lines()
+        .map(|line| line.chars().map(|c| to_tile(c)).collect())
+        .rev()
+        .collect()
+}
+
 impl ParseInput<'_, { Day::Day10 }> for AOC2023<{ Day::Day10 }> {
-    type Parsed = Map;
+    type Parsed = String;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        input
-            .lines()
-            .map(|line| line.chars().map(|c| to_tile(c)).collect())
-            .rev()
-            .collect()
+        Ok(input.to_owned())
     }
 }
 
@@ -66,8 +72,8 @@ enum Direction {
     Left,
 }
 
-fn walk_path(start: Coord, mut direction: Direction, map: &Map) -> Option<i32> {
-    let mut steps = 0;
+fn walk_path(start: Coord, mut direction: Direction, map: &Map) -> Option<Vec<Coord>> {
+    let mut path = vec![start];
     let mut curr = start;
 
     loop {
@@ -78,10 +84,10 @@ fn walk_path(start: Coord, mut direction: Direction, map: &Map) -> Option<i32> {
             Direction::Right => curr.x += 1,
             Direction::Left => curr.x -= 1,
         }
-        steps += 1;
+        path.push(curr);
 
         // Test if the new point is in bounds.
-        if curr.y > map.len() as i32 || curr.y < 0 || curr.x < 0 || curr.x > map[0].len() as i32 {
+        if curr.y >= map.len() as i32 || curr.y < 0 || curr.x < 0 || curr.x >= map[0].len() as i32 {
             return None;
         }
         let tile = map[curr.y as usize][curr.x as usize];
@@ -100,39 +106,98 @@ fn walk_path(start: Coord, mut direction: Direction, map: &Map) -> Option<i32> {
             (Direction::Left, Tile::L) => Direction::Up,
             (Direction::Left, Tile::F) => Direction::Down,
             (Direction::Left, Tile::Hyphen) => Direction::Left,
-            (_, Tile::Start) => Direction::Up,
+            (_, Tile::Start) => direction,
             (_, _) => {
                 return None;
             }
         };
 
         if curr == start {
-            return Some(steps);
+            return Some(path);
         }
     }
 }
 
-fn walk_paths(start: Coord, map: &Map) -> Result<i32> {
+fn find_path(start: Coord, map: &Map) -> Result<Vec<Coord>> {
     for direction in Direction::iter() {
-        if let Some(dist) = walk_path(start, direction, &map) {
-            return Ok(dist / 2);
+        if let Some(path) = walk_path(start, direction, &map) {
+            return Ok(path);
         }
     }
-    return Err(anyhow!("Failed to find loop."));
+    Err(anyhow!("Failed to find loop."))
 }
 
 impl Solution<'_, { Day::Day10 }, { Part::One }> for AOC2023<{ Day::Day10 }> {
-    type Input = Map;
+    type Input = String;
+    type Output = usize;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        let map = parse_map(input)?;
+        Ok(find_path(find_start(&map)?, &map)?.len() / 2)
+    }
+}
+
+impl Solution<'_, { Day::Day10 }, { Part::Two }> for AOC2023<{ Day::Day10 }> {
+    type Input = String;
     type Output = i32;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        walk_paths(find_start(&input)?, &input)
+        let map = parse_map(input)?;
+        let loop_points: HashSet<Coord> = find_path(find_start(&map)?, &map)?.into_iter().collect();
+        let mut enclosed_points: HashSet<Coord> = HashSet::new();
+
+        let mut result = 0;
+        for x in 0..map[0].len() {
+            let mut num_intersections = 0;
+            for y in 0..map.len() {
+                let tile = map[y][x];
+                let x = x as i32;
+                let y = y as i32;
+                let point = Coord { x, y };
+                if loop_points.contains(&point) {
+                    if tile != Tile::F && tile != Tile::L && tile != Tile::Pipe {
+                        num_intersections += 1;
+                    }
+                } else if num_intersections % 2 == 1 {
+                    enclosed_points.insert(point);
+                    result += 1;
+                }
+            }
+        }
+
+        for x in 0..map[0].len() {
+            for y in (0..map.len()).rev() {
+                let tile = match map[y][x] {
+                    Tile::Pipe => "|",
+                    Tile::Hyphen => "-",
+                    Tile::L => "L",
+                    Tile::J => "J",
+                    Tile::Seven => "7",
+                    Tile::F => "F",
+                    Tile::Dot => ".",
+                    Tile::Start => "S",
+                };
+                let x = x as i32;
+                let y = y as i32;
+                let point = Coord { x, y };
+                if enclosed_points.contains(&point) {
+                    print!("{}", tile.bright_red());
+                } else if loop_points.contains(&point) {
+                    print!("{}", tile.bright_green());
+                } else {
+                    print!("{tile}");
+                }
+            }
+            print!("\n");
+        }
+
+        Ok(result)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use aoc_runner::PartOneVerifier;
+    use aoc_runner::{PartOneVerifier, PartTwoVerifier};
 
     use super::*;
 
@@ -145,6 +210,27 @@ SJ.L7
 LJ...";
 
         let problem = super::AOC2023::<{ Day::Day10 }>;
-        problem.test_part1(input, 8)
+        problem.test_part1(input, 8)?;
+        let input = "...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+...........";
+        problem.test_part2(input, 4)?;
+        let input = "FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJ7F7FJ-
+L---JF-JLJ.||-FJLJJ7
+|F|F-JF---7F7-L7L|7|
+|FFJF7L7F-JF7|JL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L";
+        problem.test_part2(input, 10)
     }
 }
