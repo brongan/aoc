@@ -2,30 +2,32 @@ use super::AOC$YEAR;
 use anyhow::Result;
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
+type IR = todo!();
+type Num = todo!();
+
 impl ParseInput<'_, { Day::$DAY }> for AOC2024<{ Day::$DAY }> {
-    type Parsed = $IR;
+    type Parsed = IR;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
+        todo!()
     }
 }
 
 impl Solution<'_, { Day::$DAY }, { Part::One }> for AOC2024<{ Day::$DAY }> {
-    type Input = $IR;
-    type Output = $TODO;
+    type Input = IR;
+    type Output = Num;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let list1 = input.iter().map(|(l, _r)| l.to_owned()).collect();
-        let list2 = input.iter().map(|(_l, r)| r.to_owned()).collect();
-
-        Ok(list_distance(list1, list2))
+        todo!()
     }
 }
 
 impl Solution<'_, { Day::$DAY }, { Part::Two }> for AOC2024<{ Day::$DAY }> {
-    type Input = $IR;
-    type Output = $TODO;
+    type Input = IR;
+    type Output = Num;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        todo!()
     }
 }
 
