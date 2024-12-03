@@ -38,7 +38,7 @@ type Coord = Point2D<i32>;
 fn parse_map(input: &str) -> Result<Map> {
     input
         .lines()
-        .map(|line| line.chars().map(|c| to_tile(c)).collect())
+        .map(|line| line.chars().map(to_tile).collect())
         .rev()
         .collect()
 }
@@ -54,8 +54,7 @@ impl ParseInput<'_, { Day::Day10 }> for AOC2023<{ Day::Day10 }> {
 fn find_start(map: &Map) -> Result<Coord> {
     map.iter()
         .enumerate()
-        .map(|(y, row)| row.iter().enumerate().map(move |(x, tile)| (x, y, *tile)))
-        .flatten()
+        .flat_map(|(y, row)| row.iter().enumerate().map(move |(x, tile)| (x, y, *tile)))
         .find(|(_, _, tile)| *tile == Tile::Start)
         .map(|(x, y, _)| Coord {
             x: x as i32,
@@ -120,7 +119,7 @@ fn walk_path(start: Coord, mut direction: Direction, map: &Map) -> Option<Vec<Co
 
 fn find_path(start: Coord, map: &Map) -> Result<Vec<Coord>> {
     for direction in Direction::iter() {
-        if let Some(path) = walk_path(start, direction, &map) {
+        if let Some(path) = walk_path(start, direction, map) {
             return Ok(path);
         }
     }
@@ -188,7 +187,7 @@ impl Solution<'_, { Day::Day10 }, { Part::Two }> for AOC2023<{ Day::Day10 }> {
                     print!("{tile}");
                 }
             }
-            print!("\n");
+            println!();
         }
 
         Ok(result)

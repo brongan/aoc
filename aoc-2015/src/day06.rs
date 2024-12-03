@@ -104,8 +104,7 @@ impl Solution<'_, { Day::Day6 }, { Part::One }> for AOC2015<{ Day::Day6 }> {
         }
         Ok(state
             .iter()
-            .map(|row| row.iter().filter(|light| **light))
-            .flatten()
+            .flat_map(|row| row.iter().filter(|light| **light))
             .count())
     }
 }
@@ -127,7 +126,7 @@ impl Solution<'_, { Day::Day6 }, { Part::Two }> for AOC2015<{ Day::Day6 }> {
                 }
             }
         }
-        Ok(state.iter().map(|row| row.iter()).flatten().sum())
+        Ok(state.iter().flat_map(|row| row.iter()).sum())
     }
 }
 

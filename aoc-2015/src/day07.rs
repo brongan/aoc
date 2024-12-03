@@ -25,8 +25,8 @@ impl Operand {
         let parse_wire = |input| map(alpha1, |s: &str| s.to_string())(input);
         let parse_signal = |input| map_res(digit1, |s: &str| s.parse())(input);
         alt((
-            map(parse_wire, |w| Operand::Wire(w)),
-            map(parse_signal, |s| Operand::Signal(s)),
+            map(parse_wire, Operand::Wire),
+            map(parse_signal, Operand::Signal),
         ))(input)
     }
 }
@@ -48,7 +48,7 @@ fn parse_shift(input: &str) -> IResult<&str, u8> {
 impl Operation {
     fn parse(input: &str) -> IResult<&str, Operation> {
         let parse_literal =
-            |input| map(Operand::parse, |operand| Operation::Literal(operand))(input);
+            |input| map(Operand::parse, Operation::Literal)(input);
         let parse_not = |input| {
             map(preceded(tag("NOT "), Operand::parse), |operand: Operand| {
                 Operation::Not(operand)
@@ -133,11 +133,11 @@ fn eval_wire(
     }
     let val = match input.get(wire).context(format!("Missing {wire}"))? {
         Operation::Literal(operand) => eval_operand(operand, input, cache)?,
-        Operation::Not(wire) => !eval_operand(&wire, input, cache)?,
-        Operation::Or(l, r) => eval_operand(&l, input, cache)? | eval_operand(&r, input, cache)?,
-        Operation::And(l, r) => eval_operand(&l, input, cache)? & eval_operand(&r, input, cache)?,
-        Operation::LShift(wire, bits) => eval_operand(&wire, input, cache)? << bits,
-        Operation::RShift(wire, bits) => eval_operand(&wire, input, cache)? >> bits,
+        Operation::Not(wire) => !eval_operand(wire, input, cache)?,
+        Operation::Or(l, r) => eval_operand(l, input, cache)? | eval_operand(r, input, cache)?,
+        Operation::And(l, r) => eval_operand(l, input, cache)? & eval_operand(r, input, cache)?,
+        Operation::LShift(wire, bits) => eval_operand(wire, input, cache)? << bits,
+        Operation::RShift(wire, bits) => eval_operand(wire, input, cache)? >> bits,
     };
     cache.insert(wire.clone(), val);
     Ok(val)

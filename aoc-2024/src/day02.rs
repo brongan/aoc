@@ -57,7 +57,7 @@ impl Solution<'_, { Day::Day2 }, { Part::One }> for AOC2024<{ Day::Day2 }> {
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         Ok(input
-            .into_iter()
+            .iter()
             .map(|report| safe_report(report))
             .filter(|b| *b)
             .count())
@@ -70,7 +70,7 @@ impl Solution<'_, { Day::Day2 }, { Part::Two }> for AOC2024<{ Day::Day2 }> {
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         Ok(input
-            .into_iter()
+            .iter()
             .map(|report| safe_dampened_report(report))
             .filter(|b| *b)
             .count())

@@ -114,9 +114,9 @@ impl FromStr for CaveGraph {
                 .context("Failed to parse line")?;
             edgelists
                 .entry(nodes.0.clone())
-                .or_insert(Vec::new())
+                .or_default()
                 .push(nodes.1.clone());
-            edgelists.entry(nodes.1).or_insert(Vec::new()).push(nodes.0);
+            edgelists.entry(nodes.1).or_default().push(nodes.0);
         }
 
         Ok(CaveGraph { edgelists })

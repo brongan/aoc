@@ -92,7 +92,7 @@ fn get_type_from_counts(counts: &Counter<&Card>) -> Type {
         }
         return Type::Pair;
     }
-    return Type::HighCard;
+    Type::HighCard
 }
 
 fn score_hand_1(hand: &Hand) -> Type {

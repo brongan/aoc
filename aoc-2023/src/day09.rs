@@ -8,7 +8,6 @@ type History = Vec<Num>;
 
 fn parse_line(line: &str) -> Result<History> {
     line.split_whitespace()
-        .into_iter()
         .map(|num| num.parse::<Num>().map_err(anyhow::Error::msg))
         .collect()
 }
@@ -17,7 +16,7 @@ impl ParseInput<'_, { Day::Day9 }> for AOC2023<{ Day::Day9 }> {
     type Parsed = Vec<History>;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
-        input.lines().map(|line| parse_line(line)).collect()
+        input.lines().map(parse_line).collect()
     }
 }
 
