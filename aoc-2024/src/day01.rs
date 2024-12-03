@@ -27,7 +27,7 @@ fn list_distance(mut list1: Vec<Num>, mut list2: Vec<Num>) -> u64 {
     list2.sort();
     list1
         .into_iter()
-        .zip(list2.into_iter())
+        .zip(list2)
         .map(|(l, r)| l.abs_diff(r))
         .sum()
 }

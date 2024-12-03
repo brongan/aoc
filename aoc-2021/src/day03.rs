@@ -98,7 +98,6 @@ mod tests {
             01010"
             .to_string()
             .split_whitespace()
-            .into_iter()
             .join("\n");
         super::AOC2021::<{ Day::Day3 }>.test_part2(&input, 230)
     }

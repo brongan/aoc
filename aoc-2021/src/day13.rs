@@ -130,7 +130,7 @@ impl Solution<'_, { Day::Day13 }, { Part::One }> for AOC2021<{ Day::Day13 }> {
                 .expect("Need at least one instruction"),
         );
 
-        Ok(HashSet::<Point>::from_iter(points.into_iter()).len())
+        Ok(HashSet::<Point>::from_iter(points).len())
     }
 }
 

@@ -132,8 +132,7 @@ impl Solution<'_, { Day::Day5 }, { Part::Two }> for AOC2023<{ Day::Day5 }> {
         let seeds = input
             .seeds
             .chunks(2)
-            .map(|pair| pair[0]..(pair[0] + pair[1]))
-            .flatten()
+            .flat_map(|pair| pair[0]..(pair[0] + pair[1]))
             .collect::<Vec<_>>();
         seeds
             .par_iter()
@@ -153,7 +152,7 @@ mod tests {
     fn test_parse_seeds() -> Result<()> {
         let seeds = "seeds: 3489262449 222250568";
         assert_eq!(
-            parse_seeds(&seeds)?,
+            parse_seeds(seeds)?,
             ("", Vec::from([3489262449, 222250568]))
         );
         Ok(())
@@ -163,7 +162,7 @@ mod tests {
     fn test_parse_range_mapping() -> Result<()> {
         let input = "0 262295201 34634737";
         assert_eq!(
-            parse_range_mapping(&input)?,
+            parse_range_mapping(input)?,
             (
                 "",
                 RangeMapping {
@@ -182,7 +181,7 @@ mod tests {
 0 1 2
 3 4 5";
         assert_eq!(
-            parse_map(&input)?,
+            parse_map(input)?,
             (
                 "",
                 CategoryMap {
@@ -254,6 +253,6 @@ humidity-to-location map:
 60 56 37
 56 93 4";
         let problem = super::AOC2023::<{ Day::Day5 }>;
-        problem.test_part1(&input, 35)
+        problem.test_part1(input, 35)
     }
 }

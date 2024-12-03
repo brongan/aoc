@@ -144,8 +144,8 @@ impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2023<{ Day::Day8 }> {
             .mapping
             .keys()
             .filter(|s| s[2] == 'A')
-            .map(|node| count_until_z(&node, &input.instructions, &input.mapping))
-            .fold(1, |lcm, val| num::integer::lcm(lcm, val)))
+            .map(|node| count_until_z(node, &input.instructions, &input.mapping))
+            .fold(1, num::integer::lcm))
     }
 }
 
