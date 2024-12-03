@@ -1,7 +1,6 @@
 #![allow(incomplete_features)]
 #![feature(adt_const_params)]
 #![feature(specialization)]
-#![feature(generic_const_exprs)]
 
 use anyhow::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
