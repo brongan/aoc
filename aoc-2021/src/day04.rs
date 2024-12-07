@@ -57,13 +57,12 @@ fn is_complete(board: &BingoBoard) -> bool {
     {
         return true;
     }
-    (0..board[0].len())
-        .any(|col| {
-            board
-                .iter()
-                .map(|row| row.get(col).unwrap())
-                .all(|elem| elem.is_set)
-        })
+    (0..board[0].len()).any(|col| {
+        board
+            .iter()
+            .map(|row| row.get(col).unwrap())
+            .all(|elem| elem.is_set)
+    })
 }
 
 // Start by finding the sum of all unmarked numbers on that board.

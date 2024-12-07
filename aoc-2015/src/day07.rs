@@ -47,8 +47,7 @@ fn parse_shift(input: &str) -> IResult<&str, u8> {
 
 impl Operation {
     fn parse(input: &str) -> IResult<&str, Operation> {
-        let parse_literal =
-            |input| map(Operand::parse, Operation::Literal)(input);
+        let parse_literal = |input| map(Operand::parse, Operation::Literal)(input);
         let parse_not = |input| {
             map(preceded(tag("NOT "), Operand::parse), |operand: Operand| {
                 Operation::Not(operand)

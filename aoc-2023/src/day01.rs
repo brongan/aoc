@@ -33,7 +33,9 @@ fn parse_line(input: &str) -> Vec<u8> {
     let mut result = Vec::new();
     for i in 0..input.len() {
         let slice = &input[i..input.len()];
-        if let Ok((_, num)) = parse_number(slice) { result.push(num) }
+        if let Ok((_, num)) = parse_number(slice) {
+            result.push(num)
+        }
     }
     result
 }
