@@ -127,13 +127,3 @@ impl Solution<'_, { Day::Day5 }, { Part::Two }> for AOC2024<{ Day::Day5 }> {
             .sum())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        todo!()
-    }
-}
