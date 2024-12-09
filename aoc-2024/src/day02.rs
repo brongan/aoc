@@ -76,13 +76,3 @@ impl Solution<'_, { Day::Day2 }, { Part::Two }> for AOC2024<{ Day::Day2 }> {
             .count())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        todo!()
-    }
-}
