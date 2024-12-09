@@ -1,8 +1,9 @@
-use std::collections::HashSet;
-
 use super::AOC2024;
 use anyhow::Result;
 use aoc_runner::{point2d::Point2D, Day, ParseInput, Part, Solution};
+use rayon::prelude::*;
+use std::collections::HashSet;
+use strum_macros::Display;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Tile {
@@ -11,7 +12,7 @@ pub enum Tile {
     Guard,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Display, Eq, Hash)]
 enum Direction {
     Up,
     Right,
@@ -113,14 +114,63 @@ impl Solution<'_, { Day::Day6 }, { Part::One }> for AOC2024<{ Day::Day6 }> {
     }
 }
 
+fn guard_next(map: &Map, mut curr: Coord, mut direction: Direction) -> HashSet<Coord> {
+    let mut visited = HashSet::new();
+    let mut next_list = HashSet::new();
+
+    while inbounds(map, curr) {
+        visited.insert(curr);
+        let next = step(curr, direction);
+        if inbounds(map, next) {
+            next_list.insert(next);
+        }
+        if inbounds(map, next) && map[next.y as usize][next.x as usize] == Tile::Obstacle {
+            direction = direction.turn();
+        } else {
+            curr = next;
+        }
+    }
+
+    next_list
+}
+
+fn has_cycle(map: &Map, mut curr: Coord, mut direction: Direction) -> bool {
+    let mut visited = HashSet::new();
+
+    while inbounds(map, curr) {
+        if visited.contains(&(curr, direction)) {
+            return true;
+        }
+        visited.insert((curr, direction));
+        let next = step(curr, direction);
+        if inbounds(map, next) && map[next.y as usize][next.x as usize] == Tile::Obstacle {
+            direction = direction.turn();
+        } else {
+            curr = next;
+        }
+    }
+    false
+}
+
 impl Solution<'_, { Day::Day6 }, { Part::Two }> for AOC2024<{ Day::Day6 }> {
     type Input = Map;
     type Output = Num;
 
     fn solve(&self, map: &Self::Input) -> Result<Self::Output> {
-        let visited = guard_visits(map, find_start(map), Direction::Up);
-        // Return every naturally visited space where that participates in a rectangle with 3 other
-        // obstacles. Turning logic is sus.
-        todo!()
+        let start = find_start(map);
+        let next = guard_next(map, start, Direction::Up);
+        let ret = next
+            .into_par_iter()
+            .map(|obstacle| {
+                let mut map = map.to_owned();
+                map[obstacle.y as usize][obstacle.x as usize] = Tile::Obstacle;
+                if has_cycle(&map, start, Direction::Up) {
+                    1
+                } else {
+                    0
+                }
+            })
+            .sum();
+        Ok(ret)
     }
 }
