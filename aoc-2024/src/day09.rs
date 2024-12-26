@@ -75,8 +75,8 @@ fn defragment(disk: &DiskMap) -> Disk {
 
     // find last file
     // find first empty block we can stuff it in
-    // repeat until 
-    let r = 
+    // repeat until
+    let r = todo!();
 }
 
 fn checksum(disk: Disk) -> usize {
@@ -102,7 +102,7 @@ impl Solution<'_, { Day::Day9 }, { Part::Two }> for AOC2024<{ Day::Day9 }> {
     type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let disk= defragment(input);
+        let disk = defragment(input);
         Ok(checksum(disk))
     }
 }
