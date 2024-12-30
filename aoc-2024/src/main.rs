@@ -14,6 +14,7 @@ mod day08;
 mod day09;
 mod day10;
 mod day11;
+mod day12;
 mod day13;
 
 use anyhow::anyhow;
@@ -46,6 +47,7 @@ fn solve(day: &Day) -> Result<()> {
         Day::Day9 => AOC2024::<{ Day::Day9 }>.run(&input),
         Day::Day10 => AOC2024::<{ Day::Day10 }>.run(&input),
         Day::Day11 => AOC2024::<{ Day::Day11 }>.run(&input),
+        Day::Day12 => AOC2024::<{ Day::Day12 }>.run(&input),
         Day::Day13 => AOC2024::<{ Day::Day13 }>.run(&input),
         _ => Err(anyhow!("Day not implemented yet")),
     }
