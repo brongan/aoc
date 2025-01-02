@@ -6,7 +6,7 @@ use nom::IResult;
 use num::Signed;
 use std::cmp::{max, min};
 use std::fmt::{Debug, Display, Formatter};
-use std::ops::{Add, Sub};
+use std::ops::{Add, Mul, Sub};
 use std::str::FromStr;
 
 #[derive(Copy, Clone, Default, Eq, Hash, PartialEq)]
@@ -78,6 +78,19 @@ where
     }
 }
 
+impl<T> Add<T> for Point2D<T>
+where
+    T: Add<Output = T> + Copy,
+{
+    type Output = Self;
+    fn add(self, rhs: T) -> Self::Output {
+        Self {
+            x: self.x + rhs,
+            y: self.y + rhs,
+        }
+    }
+}
+
 impl<T> Sub for Point2D<T>
 where
     T: Sub<Output = T>,
@@ -87,6 +100,20 @@ where
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
+        }
+    }
+}
+
+impl<T> Mul<T> for Point2D<T>
+where
+    T: Mul<Output = T> + Copy,
+{
+    type Output = Self;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
         }
     }
 }
