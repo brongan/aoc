@@ -62,6 +62,7 @@ impl Garden {
         let mut regions = Vec::new();
         let dfs = |point: Point, target: char, visited: &mut HashSet<Point>| -> Region {
             let mut perimeter = 0;
+            let mut sides = 0;
             let mut to_visit = Vec::from([point]);
             let mut plots = HashSet::new();
             while let Some(point) = to_visit.pop() {

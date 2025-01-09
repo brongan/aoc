@@ -1,7 +1,7 @@
 use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
-use nom::combinator::recognize;
-use nom::sequence::separated_pair;
+use nom::combinator::{opt, recognize};
+use nom::sequence::{preceded, separated_pair};
 use nom::IResult;
 use num::Signed;
 use std::cmp::{max, min};
@@ -29,7 +29,11 @@ where
 }
 
 pub fn recognize_point2d(input: &str) -> IResult<&str, &str> {
-    recognize(separated_pair(digit1, tag(","), digit1))(input)
+    recognize(separated_pair(
+        preceded(opt(tag("-")), digit1),
+        tag(","),
+        preceded(opt(tag("-")), digit1),
+    ))(input)
 }
 
 impl<T> FromStr for Point2D<T>
@@ -125,6 +129,7 @@ mod tests {
     #[test]
     fn test_recognize() {
         assert_eq!(recognize_point2d("123,456\n "), Ok(("\n ", "123,456")));
+        assert_eq!(recognize_point2d("-123,-456\n "), Ok(("\n ", "-123,-456")));
         assert!(recognize_point2d("a,b").is_err());
     }
 }
