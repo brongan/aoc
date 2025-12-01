@@ -1,0 +1,22 @@
+[package]
+name = "aoc-2025"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow.workspace = true
+aoc-runner.workspace = true
+colored = "2.0.0"
+counter.workspace = true
+indicatif = { version = "0.17.9", features = ["rayon"] }
+itertools.workspace = true
+nom.workspace = true
+num.workspace = true
+num_enum.workspace = true
+rayon.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+

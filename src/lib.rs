@@ -187,7 +187,7 @@ pub fn run_solutions(solver: &dyn Fn(&Day) -> Result<()>) {
         }
     } else {
         for day in Day::iter() {
-            println!("Solving AOC 2021 Day: {day:?}");
+            println!("Solving AOC Day: {day:?}");
             match solver(&day) {
                 Ok(_) => (),
                 Err(e) => eprintln!("Error: {e}"),

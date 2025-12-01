@@ -94,6 +94,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "aoc-2025"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aoc-runner",
+ "colored",
+ "counter",
+ "indicatif",
+ "itertools",
+ "nom",
+ "num",
+ "num_enum",
+ "pretty_assertions",
+ "rayon",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "aoc-runner"
 version = "0.1.0"
 dependencies = [
