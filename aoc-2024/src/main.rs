@@ -2,6 +2,7 @@
 #![feature(adt_const_params)]
 #![feature(iter_advance_by)]
 #![feature(specialization)]
+#![feature(map_try_insert)]
 
 mod day01;
 mod day02;
