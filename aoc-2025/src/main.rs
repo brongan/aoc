@@ -1,7 +1,9 @@
 #![feature(adt_const_params)]
+#![feature(array_windows)]
 
 mod day01;
 mod day02;
+mod day03;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -24,6 +26,7 @@ fn solve(day: &Day) -> Result<()> {
     match day {
         Day::Day1 => AOC2025::<{ Day::Day1 }>.run(&input),
         Day::Day2 => AOC2025::<{ Day::Day2 }>.run(&input),
+        Day::Day3 => AOC2025::<{ Day::Day3 }>.run(&input),
         _ => Err(anyhow!("Day not implemented yet")),
     }
 }
