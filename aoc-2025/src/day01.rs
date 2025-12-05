@@ -52,7 +52,7 @@ impl Solution<'_, { Day::Day1 }, { Part::Two }> for AOC2025<{ Day::Day1 }> {
         let mut count = 0;
 
         for num in input {
-            for i in 0..num.abs() {
+            for _ in 0..num.abs() {
                 if *num > 0 {
                     dial += 1;
                 } else {
