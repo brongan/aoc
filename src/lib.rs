@@ -10,7 +10,9 @@ use std::{fmt::Display, marker::ConstParamTy};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+pub mod graph;
 pub mod point2d;
+pub mod point3d;
 
 #[derive(
     PartialEq,

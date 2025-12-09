@@ -117,6 +117,7 @@ name = "aoc-runner"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "disjoint",
  "is_type",
  "nom",
  "num",
@@ -262,6 +263,12 @@ name = "diff"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
+
+[[package]]
+name = "disjoint"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c37b399c91d093763e38c7a57a740e0005e30e5aff7132e791aada5eef3fed99"
 
 [[package]]
 name = "either"

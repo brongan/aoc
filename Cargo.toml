@@ -15,6 +15,7 @@ edition = "2021"
 
 [dependencies]
 anyhow.workspace = true
+disjoint = "0.8.0"
 is_type = "0.2"
 nom.workspace = true
 num.workspace = true
