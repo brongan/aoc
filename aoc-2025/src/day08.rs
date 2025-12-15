@@ -1,16 +1,13 @@
 use std::str::FromStr;
 
 use super::AOC2025;
-use anyhow::Result;
-use aoc_runner::graph::{Edge, Graph, kruskal};
+use anyhow::{Context, Result};
+use aoc_runner::graph::{Edge, Graph, kruskal, kruskal_with_limit};
 use aoc_runner::point3d::{Point3D, euclidean_distance_squared};
 use aoc_runner::{Day, ParseInput, Part, Solution};
 
-type IR = Graph3D;
-type Num = usize;
-
 impl ParseInput<'_, { Day::Day8 }> for AOC2025<{ Day::Day8 }> {
-    type Parsed = IR;
+    type Parsed = Graph3D;
 
     fn parse_input(&self, input: &'_ str) -> Result<Self::Parsed> {
         let points: Vec<Point3D<i64>> = input
@@ -37,6 +34,8 @@ pub struct Edge3D {
     first: usize,
     second: usize,
     dist_squared: i64,
+    coord1: Point3D<i64>,
+    coord2: Point3D<i64>,
 }
 
 impl Edge3D {
@@ -47,6 +46,8 @@ impl Edge3D {
             first,
             second,
             dist_squared,
+            coord1,
+            coord2,
         }
     }
 }
@@ -81,11 +82,11 @@ impl Graph for Graph3D {
 }
 
 impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2025<{ Day::Day8 }> {
-    type Input = IR;
-    type Output = Num;
+    type Input = Graph3D;
+    type Output = usize;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
-        let mut connected_components = kruskal(input, 1000).sets();
+        let mut connected_components = kruskal_with_limit(input, 1000).sets();
         connected_components.sort_by_key(|set| set.len());
         let ret = connected_components
             .iter()
@@ -95,5 +96,17 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2025<{ Day::Day8 }> {
             .product();
 
         Ok(ret)
+    }
+}
+
+impl Solution<'_, { Day::Day8 }, { Part::Two }> for AOC2025<{ Day::Day8 }> {
+    type Input = Graph3D;
+    type Output = i64;
+
+    fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
+        Ok(kruskal(input)
+            .last()
+            .map(|edge| edge.coord1.x * edge.coord2.x)
+            .context("Empty Kruskal??")?)
     }
 }

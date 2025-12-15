@@ -11,15 +11,13 @@ pub trait Graph {
 
 use disjoint::DisjointSet;
 
-pub fn kruskal<G: Graph>(graph: &G, unions: usize) -> DisjointSet {
-    let mut result_edges = Vec::new();
+pub fn kruskal_with_limit<G: Graph>(graph: &G, unions: usize) -> DisjointSet {
     let mut vertices = DisjointSet::with_len(graph.number_vertices());
     let mut count = 0;
 
     for edge in graph.edges_ordered_by_weight() {
         if !vertices.is_joined(edge.first_vertex(), edge.second_vertex()) {
             vertices.join(edge.first_vertex(), edge.second_vertex());
-            result_edges.push(edge);
         }
         count += 1;
         if count > unions {
@@ -27,4 +25,17 @@ pub fn kruskal<G: Graph>(graph: &G, unions: usize) -> DisjointSet {
         }
     }
     vertices
+}
+
+pub fn kruskal<G: Graph>(graph: &G) -> Vec<G::E> {
+    let mut edges = Vec::new();
+    let mut vertices = DisjointSet::with_len(graph.number_vertices());
+
+    for edge in graph.edges_ordered_by_weight() {
+        if !vertices.is_joined(edge.first_vertex(), edge.second_vertex()) {
+            vertices.join(edge.first_vertex(), edge.second_vertex());
+            edges.push(edge);
+        }
+    }
+    edges
 }
