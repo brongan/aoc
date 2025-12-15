@@ -92,7 +92,7 @@ impl Solution<'_, { Day::Day8 }, { Part::One }> for AOC2025<{ Day::Day8 }> {
             .rev()
             .take(3)
             .map(|set| set.len())
-            .sum();
+            .product();
 
         Ok(ret)
     }
