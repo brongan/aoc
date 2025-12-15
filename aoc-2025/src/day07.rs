@@ -50,7 +50,7 @@ impl Solution<'_, { Day::Day7 }, { Part::One }> for AOC2025<{ Day::Day7 }> {
     }
 }
 
-fn timelines(input: &Vec<Vec<char>>, index: usize) -> u32 {
+fn timelines(input: &Vec<Vec<char>>, index: usize) -> u64 {
     let width = input[0].len();
     let mut scores = vec![1; width];
     for row in input.iter().rev() {
@@ -69,7 +69,7 @@ fn timelines(input: &Vec<Vec<char>>, index: usize) -> u32 {
 
 impl Solution<'_, { Day::Day7 }, { Part::Two }> for AOC2025<{ Day::Day7 }> {
     type Input = IR;
-    type Output = u32;
+    type Output = u64;
 
     fn solve(&self, input: &Self::Input) -> Result<Self::Output> {
         let manifold_index = input[0].iter().position(|x| *x == 'S').unwrap();
