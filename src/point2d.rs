@@ -28,6 +28,14 @@ where
     max(l.x, r.x).abs_sub(&min(l.x, r.x)) + max(l.y, r.y).abs_sub(&min(l.y, r.y))
 }
 
+pub fn manhattan_area_inclusive<T>(l: &Point2D<T>, r: &Point2D<T>) -> T
+where
+    T: Signed + std::cmp::Ord + Copy,
+{
+    (max(l.x, r.x) + num::one()).abs_sub(&min(l.x, r.x))
+        * (max(l.y, r.y) + num::one()).abs_sub(&min(l.y, r.y))
+}
+
 pub fn recognize_point2d(input: &str) -> IResult<&str, &str> {
     recognize(separated_pair(
         preceded(opt(tag("-")), digit1),
